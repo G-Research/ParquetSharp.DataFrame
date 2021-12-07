@@ -16,12 +16,12 @@ namespace ParquetSharp.DataFrame
 
         public bool OnLogicalColumnReader<TElement>(LogicalColumnReader<TElement> columnReader)
         {
-            TElement[] buffer = new TElement[columnReader.BufferLength];
+            var buffer = new TElement[columnReader.BufferLength];
             long offset = 0;
             while (columnReader.HasNext)
             {
-                int read = columnReader.ReadBatch((Span<TElement>) buffer);
-                for (int i = 0; i != read; ++i)
+                var read = columnReader.ReadBatch((Span<TElement>) buffer);
+                for (var i = 0; i != read; ++i)
                 {
                     _dataFrameColumn[_offset + offset + i] = buffer[i];
                 }

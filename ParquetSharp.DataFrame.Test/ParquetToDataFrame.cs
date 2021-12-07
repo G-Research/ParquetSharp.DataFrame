@@ -18,6 +18,7 @@ namespace ParquetSharp.DataFrame.Test
                 new Column<string>("string"),
                 new Column<bool>("bool"),
                 new Column<DateTime>("dateTime"),
+                new Column<Decimal>("decimal", LogicalType.Decimal(29, 3)),
             };
 
             const int numRows = 10_000;
@@ -27,6 +28,7 @@ namespace ParquetSharp.DataFrame.Test
             var boolData = Enumerable.Range(0, numRows).Select(i => i % 2 == 0).ToArray();
             var dateTimeData = Enumerable.Range(0, numRows)
                 .Select(i => new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)).ToArray();
+            var decimalData = Enumerable.Range(0, numRows).Select(i => ((decimal) i) / 100).ToArray();
 
             using var buffer = new ResizableBuffer();
             using (var output = new BufferOutputStream(buffer))
@@ -49,6 +51,9 @@ namespace ParquetSharp.DataFrame.Test
 
                 using var dateTimeCol = rowGroupWriter.NextColumn().LogicalWriter<DateTime>();
                 dateTimeCol.WriteBatch(dateTimeData);
+
+                using var decimalCol = rowGroupWriter.NextColumn().LogicalWriter<Decimal>();
+                decimalCol.WriteBatch(decimalData);
 
                 fileWriter.Close();
             }
@@ -103,6 +108,15 @@ namespace ParquetSharp.DataFrame.Test
                 for (int i = 0; i < numRows; ++i)
                 {
                     Assert.Equal(dateTimeData[i], dateTimeCol[i]);
+                }
+
+                var decimalCol = dataFrame["decimal"];
+                Assert.IsType<DecimalDataFrameColumn>(decimalCol);
+                Assert.Equal(numRows, decimalCol.Length);
+                Assert.Equal(0, decimalCol.NullCount);
+                for (int i = 0; i < numRows; ++i)
+                {
+                    Assert.Equal(decimalData[i], decimalCol[i]);
                 }
 
                 fileReader.Close();
