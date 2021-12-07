@@ -42,7 +42,7 @@ namespace ParquetSharp.DataFrame.Test
                     var dataFrameColumn = dataFrame[column.ParquetColumn.Name];
                     Assert.IsType(column.ExpectedColumnType, dataFrameColumn);
                     Assert.Equal(numRows, dataFrameColumn.Length);
-                    Assert.Equal(0, dataFrameColumn.NullCount);
+                    Assert.Equal(column.NullCount?.Invoke(numRows) ?? 0, dataFrameColumn.NullCount);
                     column.VerifyColumn(dataFrameColumn);
                 }
 
@@ -56,6 +56,7 @@ namespace ParquetSharp.DataFrame.Test
             public Type ExpectedColumnType { get; init;  }
             public Action<int, ColumnWriter> WriteColumn { get; init;  }
             public Action<DataFrameColumn> VerifyColumn { get; init;  }
+            public Func<long, long> NullCount { get; init; }
         }
 
         private static TestColumn[] GetTestColumns()
@@ -81,6 +82,24 @@ namespace ParquetSharp.DataFrame.Test
                 },
                 new TestColumn
                 {
+                    ParquetColumn = new Column<int?>("nullable_int"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<int>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<int?>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (int?) null : i).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i % 10 == 0 ? (int?) null : i, column[i]);
+                        }
+                    },
+                    NullCount = numRows => numRows / 10,
+                },
+                new TestColumn
+                {
                     ParquetColumn = new Column<double>("double"),
                     ExpectedColumnType = typeof(PrimitiveDataFrameColumn<double>),
                     WriteColumn = (numRows, columnWriter) =>
@@ -95,6 +114,24 @@ namespace ParquetSharp.DataFrame.Test
                             Assert.Equal((double) i, column[i]);
                         }
                     }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<double?>("nullable_double"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<double>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<double?>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (double?) null : i).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i % 10 == 0 ? (double?) null : i, column[i]);
+                        }
+                    },
+                    NullCount = numRows => numRows / 10,
                 },
                 new TestColumn
                 {
@@ -132,6 +169,24 @@ namespace ParquetSharp.DataFrame.Test
                 },
                 new TestColumn
                 {
+                    ParquetColumn = new Column<bool?>("nullable_bool"),
+                    ExpectedColumnType = typeof(BooleanDataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<bool?>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (bool?) null : (i % 2 == 0)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i % 10 == 0 ? (bool?) null : (i % 2 == 0), column[i]);
+                        }
+                    },
+                    NullCount = numRows => numRows / 10,
+                },
+                new TestColumn
+                {
                     ParquetColumn = new Column<DateTime>("dateTime"),
                     ExpectedColumnType = typeof(PrimitiveDataFrameColumn<DateTime>),
                     WriteColumn = (numRows, columnWriter) =>
@@ -151,21 +206,60 @@ namespace ParquetSharp.DataFrame.Test
                 },
                 new TestColumn
                 {
-                    ParquetColumn = new Column<Decimal>("decimal", LogicalType.Decimal(29, 3)),
-                    ExpectedColumnType = typeof(DecimalDataFrameColumn),
+                    ParquetColumn = new Column<DateTime?>("nullable_dateTime"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<DateTime>),
                     WriteColumn = (numRows, columnWriter) =>
                     {
-                        using var logicalWriter = columnWriter.LogicalWriter<Decimal>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows)
-                                .Select(i => new Decimal(i) / 100).ToArray());
+                        using var logicalWriter = columnWriter.LogicalWriter<DateTime?>();
+                        logicalWriter.WriteBatch(
+                            Enumerable.Range(0, numRows)
+                                .Select(i => i % 10 == 0 ? (DateTime?) null : new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(new Decimal(i) / 100, column[i]);
+                            Assert.Equal(i % 10 == 0 ? (DateTime?) null : new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i), column[i]);
+                        }
+                    },
+                    NullCount = numRows => numRows / 10,
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<decimal>("decimal", LogicalType.Decimal(29, 3)),
+                    ExpectedColumnType = typeof(DecimalDataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<decimal>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows)
+                                .Select(i => new decimal(i) / 100).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(new decimal(i) / 100, column[i]);
                         }
                     }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<decimal?>("nullable_decimal", LogicalType.Decimal(29, 3)),
+                    ExpectedColumnType = typeof(DecimalDataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<decimal?>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows)
+                                .Select(i => i % 10 == 0 ? (decimal?) null : new decimal(i) / 100).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i % 10 == 0 ? (decimal?) null : new decimal(i) / 100, column[i]);
+                        }
+                    },
+                    NullCount = numRows => numRows / 10,
                 },
             };
         }

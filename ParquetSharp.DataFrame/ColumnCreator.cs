@@ -38,8 +38,8 @@ namespace ParquetSharp.DataFrame
                 case LogicalColumnReader<DateTime>:
                 case LogicalColumnReader<DateTime?>:
                     return new PrimitiveDataFrameColumn<DateTime>(_columnName, _numRows);
-                case LogicalColumnReader<Decimal>:
-                case LogicalColumnReader<Decimal?>:
+                case LogicalColumnReader<decimal>:
+                case LogicalColumnReader<decimal?>:
                     return new DecimalDataFrameColumn(_columnName, _numRows);
                 default:
                     throw new NotImplementedException($"Unsupported column logical type: {typeof(TElement)}");
