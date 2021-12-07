@@ -20,7 +20,13 @@ namespace ParquetSharp.DataFrame.Test
                 new Column<DateTime>("dateTime"),
             };
 
-            const int numRows = 1000;
+            const int numRows = 10_000;
+            var intData = Enumerable.Range(0, numRows).ToArray();
+            var doubleData = Enumerable.Range(0, numRows).Select(i => (double) i).ToArray();
+            var stringData = Enumerable.Range(0, numRows).Select(i => i.ToString()).ToArray();
+            var boolData = Enumerable.Range(0, numRows).Select(i => i % 2 == 0).ToArray();
+            var dateTimeData = Enumerable.Range(0, numRows)
+                .Select(i => new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)).ToArray();
 
             using var buffer = new ResizableBuffer();
             using (var output = new BufferOutputStream(buffer))
@@ -30,21 +36,19 @@ namespace ParquetSharp.DataFrame.Test
                 using var rowGroupWriter = fileWriter.AppendRowGroup();
 
                 using var intCol = rowGroupWriter.NextColumn().LogicalWriter<int>();
-                intCol.WriteBatch(Enumerable.Range(0, numRows).ToArray());
+                intCol.WriteBatch(intData);
 
                 using var doubleCol = rowGroupWriter.NextColumn().LogicalWriter<double>();
-                doubleCol.WriteBatch(Enumerable.Range(0, numRows).Select(i => (double) i).ToArray());
+                doubleCol.WriteBatch(doubleData);
 
                 using var stringCol = rowGroupWriter.NextColumn().LogicalWriter<string>();
-                stringCol.WriteBatch(Enumerable.Range(0, numRows).Select(i => i.ToString()).ToArray());
+                stringCol.WriteBatch(stringData);
 
                 using var boolCol = rowGroupWriter.NextColumn().LogicalWriter<bool>();
-                boolCol.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 2 == 0).ToArray());
+                boolCol.WriteBatch(boolData);
 
                 using var dateTimeCol = rowGroupWriter.NextColumn().LogicalWriter<DateTime>();
-                dateTimeCol.WriteBatch(
-                    Enumerable.Range(0, numRows)
-                        .Select(i => new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)).ToArray());
+                dateTimeCol.WriteBatch(dateTimeData);
 
                 fileWriter.Close();
             }
@@ -58,18 +62,48 @@ namespace ParquetSharp.DataFrame.Test
 
                 var intCol = dataFrame["int"];
                 Assert.IsType<PrimitiveDataFrameColumn<int>>(intCol);
+                Assert.Equal(numRows, intCol.Length);
+                Assert.Equal(0, intCol.NullCount);
+                for (int i = 0; i < numRows; ++i)
+                {
+                    Assert.Equal(intCol[i], intData[i]);
+                }
 
                 var doubleCol = dataFrame["double"];
                 Assert.IsType<PrimitiveDataFrameColumn<double>>(doubleCol);
+                Assert.Equal(numRows, doubleCol.Length);
+                Assert.Equal(0, doubleCol.NullCount);
+                for (int i = 0; i < numRows; ++i)
+                {
+                    Assert.Equal(doubleData[i], doubleCol[i]);
+                }
 
                 var stringCol = dataFrame["string"];
                 Assert.IsType<StringDataFrameColumn>(stringCol);
+                Assert.Equal(numRows, stringCol.Length);
+                Assert.Equal(0, stringCol.NullCount);
+                for (int i = 0; i < numRows; ++i)
+                {
+                    Assert.Equal(stringData[i], stringCol[i]);
+                }
 
                 var boolCol = dataFrame["bool"];
                 Assert.IsType<BooleanDataFrameColumn>(boolCol);
+                Assert.Equal(numRows, boolCol.Length);
+                Assert.Equal(0, boolCol.NullCount);
+                for (int i = 0; i < numRows; ++i)
+                {
+                    Assert.Equal(boolData[i], boolCol[i]);
+                }
 
                 var dateTimeCol = dataFrame["dateTime"];
                 Assert.IsType<PrimitiveDataFrameColumn<DateTime>>(dateTimeCol);
+                Assert.Equal(numRows, dateTimeCol.Length);
+                Assert.Equal(0, dateTimeCol.NullCount);
+                for (int i = 0; i < numRows; ++i)
+                {
+                    Assert.Equal(dateTimeData[i], dateTimeCol[i]);
+                }
 
                 fileReader.Close();
             }

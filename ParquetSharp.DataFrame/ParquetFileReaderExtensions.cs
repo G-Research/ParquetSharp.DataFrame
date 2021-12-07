@@ -10,15 +10,28 @@ namespace ParquetSharp.DataFrame
         {
             var numColumns = fileReader.FileMetaData.NumColumns;
             var numRows = fileReader.FileMetaData.NumRows;
-            var columns = new List<DataFrameColumn>(numColumns);
+            var dataFrameColumns = new List<DataFrameColumn>(numColumns);
 
-            for (int i = 0; i < numColumns; ++i)
+            for (int colIdx = 0; colIdx < numColumns; ++colIdx)
             {
-                var descriptor = fileReader.FileMetaData.Schema.Column(i);
-                columns.Add(CreateColumn(descriptor, numRows));
+                var descriptor = fileReader.FileMetaData.Schema.Column(colIdx);
+                dataFrameColumns.Add(CreateColumn(descriptor, numRows));
             }
 
-            return new Microsoft.Data.Analysis.DataFrame(columns);
+            long offset = 0;
+            for (int rowGroupIdx = 0; rowGroupIdx < fileReader.FileMetaData.NumRowGroups; ++rowGroupIdx)
+            {
+                using var rowGroupReader = fileReader.RowGroup(rowGroupIdx);
+                for (int colIdx = 0; colIdx < numColumns; ++colIdx)
+                {
+                    using var columnReader = rowGroupReader.Column(colIdx);
+                    using var logicalReader = columnReader.LogicalReader();
+                    logicalReader.Apply(new DataFrameSetter(dataFrameColumns[colIdx], offset));
+                }
+                offset += rowGroupReader.MetaData.NumRows;
+            }
+
+            return new Microsoft.Data.Analysis.DataFrame(dataFrameColumns);
         }
 
         private static DataFrameColumn CreateColumn(ColumnDescriptor descriptor, long numRows)
