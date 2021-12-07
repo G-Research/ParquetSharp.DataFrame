@@ -11,49 +11,21 @@ namespace ParquetSharp.DataFrame.Test
         [Fact]
         public void TestToDataFrame()
         {
-            var columns = new Column[]
-            {
-                new Column<int>("int"),
-                new Column<double>("double"),
-                new Column<string>("string"),
-                new Column<bool>("bool"),
-                new Column<DateTime>("dateTime"),
-                new Column<Decimal>("decimal", LogicalType.Decimal(29, 3)),
-            };
-
+            var testColumns = GetTestColumns();
             const int numRows = 10_000;
-            var intData = Enumerable.Range(0, numRows).ToArray();
-            var doubleData = Enumerable.Range(0, numRows).Select(i => (double) i).ToArray();
-            var stringData = Enumerable.Range(0, numRows).Select(i => i.ToString()).ToArray();
-            var boolData = Enumerable.Range(0, numRows).Select(i => i % 2 == 0).ToArray();
-            var dateTimeData = Enumerable.Range(0, numRows)
-                .Select(i => new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)).ToArray();
-            var decimalData = Enumerable.Range(0, numRows).Select(i => ((decimal) i) / 100).ToArray();
 
             using var buffer = new ResizableBuffer();
             using (var output = new BufferOutputStream(buffer))
             {
                 var propertiesBuilder = new WriterPropertiesBuilder();
+                var columns = testColumns.Select(c => c.ParquetColumn).ToArray();
                 using var fileWriter = new ParquetFileWriter(output, columns, propertiesBuilder.Build());
                 using var rowGroupWriter = fileWriter.AppendRowGroup();
 
-                using var intCol = rowGroupWriter.NextColumn().LogicalWriter<int>();
-                intCol.WriteBatch(intData);
-
-                using var doubleCol = rowGroupWriter.NextColumn().LogicalWriter<double>();
-                doubleCol.WriteBatch(doubleData);
-
-                using var stringCol = rowGroupWriter.NextColumn().LogicalWriter<string>();
-                stringCol.WriteBatch(stringData);
-
-                using var boolCol = rowGroupWriter.NextColumn().LogicalWriter<bool>();
-                boolCol.WriteBatch(boolData);
-
-                using var dateTimeCol = rowGroupWriter.NextColumn().LogicalWriter<DateTime>();
-                dateTimeCol.WriteBatch(dateTimeData);
-
-                using var decimalCol = rowGroupWriter.NextColumn().LogicalWriter<Decimal>();
-                decimalCol.WriteBatch(decimalData);
+                foreach (var column in testColumns)
+                {
+                    column.WriteColumn(numRows, rowGroupWriter.NextColumn());
+                }
 
                 fileWriter.Close();
             }
@@ -63,64 +35,140 @@ namespace ParquetSharp.DataFrame.Test
                 using var fileReader = new ParquetFileReader(input);
                 var dataFrame = fileReader.ToDataFrame();
 
-                Assert.Equal(columns.Length, dataFrame.Columns.Count);
+                Assert.Equal(testColumns.Length, dataFrame.Columns.Count);
 
-                var intCol = dataFrame["int"];
-                Assert.IsType<PrimitiveDataFrameColumn<int>>(intCol);
-                Assert.Equal(numRows, intCol.Length);
-                Assert.Equal(0, intCol.NullCount);
-                for (int i = 0; i < numRows; ++i)
+                foreach (var column in testColumns)
                 {
-                    Assert.Equal(intCol[i], intData[i]);
-                }
-
-                var doubleCol = dataFrame["double"];
-                Assert.IsType<PrimitiveDataFrameColumn<double>>(doubleCol);
-                Assert.Equal(numRows, doubleCol.Length);
-                Assert.Equal(0, doubleCol.NullCount);
-                for (int i = 0; i < numRows; ++i)
-                {
-                    Assert.Equal(doubleData[i], doubleCol[i]);
-                }
-
-                var stringCol = dataFrame["string"];
-                Assert.IsType<StringDataFrameColumn>(stringCol);
-                Assert.Equal(numRows, stringCol.Length);
-                Assert.Equal(0, stringCol.NullCount);
-                for (int i = 0; i < numRows; ++i)
-                {
-                    Assert.Equal(stringData[i], stringCol[i]);
-                }
-
-                var boolCol = dataFrame["bool"];
-                Assert.IsType<BooleanDataFrameColumn>(boolCol);
-                Assert.Equal(numRows, boolCol.Length);
-                Assert.Equal(0, boolCol.NullCount);
-                for (int i = 0; i < numRows; ++i)
-                {
-                    Assert.Equal(boolData[i], boolCol[i]);
-                }
-
-                var dateTimeCol = dataFrame["dateTime"];
-                Assert.IsType<PrimitiveDataFrameColumn<DateTime>>(dateTimeCol);
-                Assert.Equal(numRows, dateTimeCol.Length);
-                Assert.Equal(0, dateTimeCol.NullCount);
-                for (int i = 0; i < numRows; ++i)
-                {
-                    Assert.Equal(dateTimeData[i], dateTimeCol[i]);
-                }
-
-                var decimalCol = dataFrame["decimal"];
-                Assert.IsType<DecimalDataFrameColumn>(decimalCol);
-                Assert.Equal(numRows, decimalCol.Length);
-                Assert.Equal(0, decimalCol.NullCount);
-                for (int i = 0; i < numRows; ++i)
-                {
-                    Assert.Equal(decimalData[i], decimalCol[i]);
+                    var dataFrameColumn = dataFrame[column.ParquetColumn.Name];
+                    Assert.IsType(column.ExpectedColumnType, dataFrameColumn);
+                    Assert.Equal(numRows, dataFrameColumn.Length);
+                    Assert.Equal(0, dataFrameColumn.NullCount);
+                    column.VerifyColumn(dataFrameColumn);
                 }
 
                 fileReader.Close();
             }
         }
+
+        private readonly struct TestColumn
+        {
+            public Column ParquetColumn { get; init; }
+            public Type ExpectedColumnType { get; init;  }
+            public Action<int, ColumnWriter> WriteColumn { get; init;  }
+            public Action<DataFrameColumn> VerifyColumn { get; init;  }
+        }
+
+        private static TestColumn[] GetTestColumns()
+        {
+            return new []
+            {
+                new TestColumn
+                {
+                    ParquetColumn = new Column<int>("int"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<int>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<int>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i, column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<double>("double"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<double>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<double>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (double) i).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal((double) i, column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<string>("string"),
+                    ExpectedColumnType = typeof(StringDataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<string>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i.ToString()).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i.ToString(), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<bool>("bool"),
+                    ExpectedColumnType = typeof(BooleanDataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<bool>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 2 == 0).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i % 2 == 0, column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<DateTime>("dateTime"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<DateTime>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<DateTime>();
+                        logicalWriter.WriteBatch(
+                            Enumerable.Range(0, numRows)
+                                .Select(i => new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<Decimal>("decimal", LogicalType.Decimal(29, 3)),
+                    ExpectedColumnType = typeof(DecimalDataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<Decimal>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows)
+                                .Select(i => new Decimal(i) / 100).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(new Decimal(i) / 100, column[i]);
+                        }
+                    }
+                },
+            };
+        }
+
     }
 }
