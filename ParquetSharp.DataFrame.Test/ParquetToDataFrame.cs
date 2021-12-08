@@ -17,9 +17,8 @@ namespace ParquetSharp.DataFrame.Test
             using var buffer = new ResizableBuffer();
             using (var output = new BufferOutputStream(buffer))
             {
-                var propertiesBuilder = new WriterPropertiesBuilder();
                 var columns = testColumns.Select(c => c.ParquetColumn).ToArray();
-                using var fileWriter = new ParquetFileWriter(output, columns, propertiesBuilder.Build());
+                using var fileWriter = new ParquetFileWriter(output, columns);
                 using var rowGroupWriter = fileWriter.AppendRowGroup();
 
                 foreach (var column in testColumns)

@@ -6,12 +6,12 @@ namespace ParquetSharp
 {
     public static class DataFrameExtensions
     {
-        public static void ToParquet(this DataFrame dataFrame, string path)
+        public static void ToParquet(this DataFrame dataFrame, string path, WriterProperties writerProperties = null)
         {
-            var propertiesBuilder = new WriterPropertiesBuilder();
-            using var writerProperties = propertiesBuilder.Build();
             var schemaColumns = dataFrame.Columns.Select(GetSchemaColumn).ToArray();
-            using var fileWriter = new ParquetFileWriter(path, schemaColumns, writerProperties);
+            using var fileWriter = writerProperties == null
+                ? new ParquetFileWriter(path, schemaColumns)
+                : new ParquetFileWriter(path, schemaColumns, writerProperties);
 
             const int rowGroupSize = 1024 * 1024;
             var numRows = dataFrame.Rows.Count;

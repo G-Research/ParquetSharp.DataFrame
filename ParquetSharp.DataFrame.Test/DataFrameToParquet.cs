@@ -47,6 +47,41 @@ namespace ParquetSharp.DataFrame.Test
             }
         }
 
+        [Fact]
+        public void TestCustomParquetWriterProperties()
+        {
+            int numRows = 10_000;
+            var testColumns = GetTestColumns().Where(c => c.GetColumn(1).Name == "int").ToArray();
+            Assert.Single(testColumns);
+
+            using var dir = new UnitTestDisposableDirectory();
+            var filePath = Path.Join(dir.Info.FullName, "test.parquet");
+
+            {
+                var columns = new[] {testColumns[0].GetColumn(numRows)};
+                var dataFrame = new Microsoft.Data.Analysis.DataFrame(columns);
+
+                using var propertiesBuilder = new WriterPropertiesBuilder();
+                propertiesBuilder.Compression(Compression.Gzip);
+                using var properties = propertiesBuilder.Build();
+
+                dataFrame.ToParquet(filePath, properties);
+            }
+
+            Assert.True(File.Exists(filePath));
+
+            using var fileReader = new ParquetFileReader(filePath);
+            Assert.Equal(testColumns.Length, fileReader.FileMetaData.NumColumns);
+            Assert.Equal(numRows, fileReader.FileMetaData.NumRows);
+
+            for (var rowGroupIdx = 0; rowGroupIdx < fileReader.FileMetaData.NumRowGroups; ++rowGroupIdx)
+            {
+                using var rowGroupReader = fileReader.RowGroup(rowGroupIdx);
+                var columnMetadata = rowGroupReader.MetaData.GetColumnChunkMetaData(0);
+                Assert.Equal(Compression.Gzip, columnMetadata.Compression);
+            }
+        }
+
         private readonly struct TestColumn
         {
             public Func<int, DataFrameColumn> GetColumn { get; init; }
