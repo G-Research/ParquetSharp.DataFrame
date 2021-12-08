@@ -143,8 +143,76 @@ namespace ParquetSharp.DataFrame.Test
             {
                 new TestColumn
                 {
+                    ParquetColumn = new Column<byte>("uint8"),
+                    ExpectedColumnType = typeof(ByteDataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<byte>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (byte) (i % 256)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal((byte) (i % 256), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<sbyte>("int8"),
+                    ExpectedColumnType = typeof(SByteDataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<sbyte>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (sbyte) (i % 256 - 128)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal((sbyte) (i % 256 - 128), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<ushort>("uint16"),
+                    ExpectedColumnType = typeof(UInt16DataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<ushort>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (ushort) (i % ushort.MaxValue)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal((ushort) (i % ushort.MaxValue), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<short>("int16"),
+                    ExpectedColumnType = typeof(Int16DataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<short>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (short) (i % short.MaxValue)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal((short) (i % short.MaxValue), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
                     ParquetColumn = new Column<int>("int"),
-                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<int>),
+                    ExpectedColumnType = typeof(Int32DataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<int>();
@@ -161,7 +229,7 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     ParquetColumn = new Column<int?>("nullable_int"),
-                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<int>),
+                    ExpectedColumnType = typeof(Int32DataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<int?>();
@@ -179,7 +247,7 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     ParquetColumn = new Column<long>("long"),
-                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<long>),
+                    ExpectedColumnType = typeof(Int64DataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<long>();
@@ -196,7 +264,7 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     ParquetColumn = new Column<long?>("nullable_long"),
-                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<long>),
+                    ExpectedColumnType = typeof(Int64DataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<long?>();
@@ -214,7 +282,7 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     ParquetColumn = new Column<float>("float"),
-                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<float>),
+                    ExpectedColumnType = typeof(SingleDataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<float>();
@@ -231,7 +299,7 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     ParquetColumn = new Column<float?>("nullable_float"),
-                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<float>),
+                    ExpectedColumnType = typeof(SingleDataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<float?>();
@@ -249,7 +317,7 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     ParquetColumn = new Column<double>("double"),
-                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<double>),
+                    ExpectedColumnType = typeof(DoubleDataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<double>();
@@ -266,7 +334,7 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     ParquetColumn = new Column<double?>("nullable_double"),
-                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<double>),
+                    ExpectedColumnType = typeof(DoubleDataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<double?>();

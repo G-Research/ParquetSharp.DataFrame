@@ -22,6 +22,11 @@ namespace ParquetSharp
 
         public DataFrameColumn OnLogicalColumnReader<TElement>(LogicalColumnReader<TElement> columnReader)
         {
+            if (columnReader.ColumnDescriptor.LogicalType is IntLogicalType intType)
+            {
+                return ColumnFromIntType(intType);
+            }
+
             switch (columnReader)
             {
                 case LogicalColumnReader<string>:
@@ -29,18 +34,36 @@ namespace ParquetSharp
                 case LogicalColumnReader<bool>:
                 case LogicalColumnReader<bool?>:
                     return new BooleanDataFrameColumn(_columnName, _numRows);
+                case LogicalColumnReader<byte>:
+                case LogicalColumnReader<byte?>:
+                    return new ByteDataFrameColumn(_columnName, _numRows);
+                case LogicalColumnReader<sbyte>:
+                case LogicalColumnReader<sbyte?>:
+                    return new SByteDataFrameColumn(_columnName, _numRows);
+                case LogicalColumnReader<ushort>:
+                case LogicalColumnReader<ushort?>:
+                    return new UInt16DataFrameColumn(_columnName, _numRows);
+                case LogicalColumnReader<short>:
+                case LogicalColumnReader<short?>:
+                    return new Int16DataFrameColumn(_columnName, _numRows);
+                case LogicalColumnReader<uint>:
+                case LogicalColumnReader<uint?>:
+                    return new UInt32DataFrameColumn(_columnName, _numRows);
                 case LogicalColumnReader<int>:
                 case LogicalColumnReader<int?>:
-                    return new PrimitiveDataFrameColumn<int>(_columnName, _numRows);
+                    return new Int32DataFrameColumn(_columnName, _numRows);
+                case LogicalColumnReader<ulong>:
+                case LogicalColumnReader<ulong?>:
+                    return new UInt64DataFrameColumn(_columnName, _numRows);
                 case LogicalColumnReader<long>:
                 case LogicalColumnReader<long?>:
-                    return new PrimitiveDataFrameColumn<long>(_columnName, _numRows);
+                    return new Int64DataFrameColumn(_columnName, _numRows);
                 case LogicalColumnReader<float>:
                 case LogicalColumnReader<float?>:
-                    return new PrimitiveDataFrameColumn<float>(_columnName, _numRows);
+                    return new SingleDataFrameColumn(_columnName, _numRows);
                 case LogicalColumnReader<double>:
                 case LogicalColumnReader<double?>:
-                    return new PrimitiveDataFrameColumn<double>(_columnName, _numRows);
+                    return new DoubleDataFrameColumn(_columnName, _numRows);
                 case LogicalColumnReader<DateTime>:
                 case LogicalColumnReader<DateTime?>:
                     return new PrimitiveDataFrameColumn<DateTime>(_columnName, _numRows);
@@ -50,6 +73,21 @@ namespace ParquetSharp
                 default:
                     throw new NotImplementedException($"Unsupported column logical type: {typeof(TElement)}");
             }
+        }
+
+        private DataFrameColumn ColumnFromIntType(IntLogicalType intType)
+        {
+            return (intType.BitWidth, intType.IsSigned) switch
+            {
+                (8, false) => new ByteDataFrameColumn(_columnName, _numRows),
+                (8, true) => new SByteDataFrameColumn(_columnName, _numRows),
+                (16, false) => new UInt16DataFrameColumn(_columnName, _numRows),
+                (16, true) => new Int16DataFrameColumn(_columnName, _numRows),
+                (32, false) => new UInt32DataFrameColumn(_columnName, _numRows),
+                (32, true) => new Int32DataFrameColumn(_columnName, _numRows),
+                (_, false) => new UInt64DataFrameColumn(_columnName, _numRows),
+                (_, true) => new Int64DataFrameColumn(_columnName, _numRows)
+            };
         }
 
         private readonly string _columnName;
