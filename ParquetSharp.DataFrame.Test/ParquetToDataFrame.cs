@@ -100,6 +100,76 @@ namespace ParquetSharp.DataFrame.Test
                 },
                 new TestColumn
                 {
+                    ParquetColumn = new Column<long>("long"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<long>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<long>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (long) i).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal((long) i, column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<long?>("nullable_long"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<long>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<long?>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (long?) null : i).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (long i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i % 10 == 0 ? null : i, column[i]);
+                        }
+                    },
+                    NullCount = numRows => numRows / 10,
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<float>("float"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<float>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<float>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (float) i).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal((float) i, column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<float?>("nullable_float"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<float>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<float?>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (float?) null : i).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i % 10 == 0 ? (float?) null : i, column[i]);
+                        }
+                    },
+                    NullCount = numRows => numRows / 10,
+                },
+                new TestColumn
+                {
                     ParquetColumn = new Column<double>("double"),
                     ExpectedColumnType = typeof(PrimitiveDataFrameColumn<double>),
                     WriteColumn = (numRows, columnWriter) =>

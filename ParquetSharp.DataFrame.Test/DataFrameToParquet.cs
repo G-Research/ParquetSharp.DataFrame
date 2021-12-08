@@ -75,6 +75,20 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<long>("long", Enumerable.Range(0, numRows).Select(i => (long) i)),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<long>, offset, Assert.Equal),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<long>("nullable_long", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (long?) null : i)),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<long?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : i, elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
                         new PrimitiveDataFrameColumn<float>("float", Enumerable.Range(0, numRows).Select(i => (float) i)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<float>, offset, (i, elem) => Assert.Equal(i, elem)),
