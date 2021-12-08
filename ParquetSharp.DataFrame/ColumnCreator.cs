@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Data.Analysis;
 
-namespace ParquetSharp.DataFrame
+namespace ParquetSharp
 {
     /// <summary>
     /// LogicalColumnReaderVisitor that creates DataFrameColumns

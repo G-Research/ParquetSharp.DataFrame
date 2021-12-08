@@ -2,11 +2,11 @@ using System;
 using System.Linq;
 using Microsoft.Data.Analysis;
 
-namespace ParquetSharp.DataFrame
+namespace ParquetSharp
 {
     public static class DataFrameExtensions
     {
-        public static void ToParquet(this Microsoft.Data.Analysis.DataFrame dataFrame, string path)
+        public static void ToParquet(this DataFrame dataFrame, string path)
         {
             var propertiesBuilder = new WriterPropertiesBuilder();
             using var writerProperties = propertiesBuilder.Build();

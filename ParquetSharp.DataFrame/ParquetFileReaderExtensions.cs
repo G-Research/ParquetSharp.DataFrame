@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using Microsoft.Data.Analysis;
 
-namespace ParquetSharp.DataFrame
+namespace ParquetSharp
 {
     public static class ParquetFileReaderExtensions
     {
-        public static Microsoft.Data.Analysis.DataFrame ToDataFrame(this ParquetFileReader fileReader)
+        public static DataFrame ToDataFrame(this ParquetFileReader fileReader)
         {
             var numColumns = fileReader.FileMetaData.NumColumns;
             var numRows = fileReader.FileMetaData.NumRows;
@@ -33,7 +33,7 @@ namespace ParquetSharp.DataFrame
                 offset += rowGroupReader.MetaData.NumRows;
             }
 
-            return new Microsoft.Data.Analysis.DataFrame(dataFrameColumns);
+            return new DataFrame(dataFrameColumns);
         }
     }
 }

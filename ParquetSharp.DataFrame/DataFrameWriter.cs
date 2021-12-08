@@ -1,6 +1,6 @@
 using Microsoft.Data.Analysis;
 
-namespace ParquetSharp.DataFrame
+namespace ParquetSharp
 {
     public class DataFrameWriter : ILogicalColumnWriterVisitor<bool>
     {
