@@ -131,7 +131,7 @@ namespace ParquetSharp.DataFrame.Test
             public Type ExpectedColumnType { get; init;  }
             public Action<int, ColumnWriter> WriteColumn { get; init;  }
             public Action<DataFrameColumn> VerifyColumn { get; init;  }
-            public Func<long, long> NullCount { get; init; }
+            public Func<long, long>? NullCount { get; init; }
         }
 
         private static TestColumn[] GetTestColumns()
@@ -203,7 +203,7 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         for (long i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? null : i, column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (long?) i, column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,

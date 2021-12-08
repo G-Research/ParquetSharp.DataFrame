@@ -94,7 +94,7 @@ namespace ParquetSharp.DataFrame.Test
 
             public Action<LogicalColumnReader, long> VerifyData { get; init; }
 
-            public LogicalType LogicalTypeOverride { get; init; }
+            public LogicalType? LogicalTypeOverride { get; init; }
         }
 
         private static TestColumn[] GetTestColumns()
@@ -205,10 +205,10 @@ namespace ParquetSharp.DataFrame.Test
         }
 
         private static void VerifyData<TElement>(
-            LogicalColumnReader<TElement> columnReader, long offset, Action<long, TElement> verifier)
+            LogicalColumnReader<TElement>? columnReader, long offset, Action<long, TElement> verifier)
         {
             Assert.NotNull(columnReader);
-            var buffer = new TElement[columnReader.BufferLength];
+            var buffer = new TElement[columnReader!.BufferLength];
             long readerOffset = 0;
             while (columnReader.HasNext)
             {

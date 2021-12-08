@@ -6,7 +6,7 @@ namespace ParquetSharp
 {
     public static class ParquetFileReaderExtensions
     {
-        public static DataFrame ToDataFrame(this ParquetFileReader fileReader, IReadOnlyList<string> columns = null)
+        public static DataFrame ToDataFrame(this ParquetFileReader fileReader, IReadOnlyList<string>? columns = null)
         {
             var numColumns = columns?.Count ?? fileReader.FileMetaData.NumColumns;
             var numRows = fileReader.FileMetaData.NumRows;

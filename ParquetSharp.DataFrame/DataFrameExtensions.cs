@@ -8,8 +8,8 @@ namespace ParquetSharp
     public static class DataFrameExtensions
     {
         public static void ToParquet(
-            this DataFrame dataFrame, string path, WriterProperties writerProperties = null,
-            IReadOnlyDictionary<string, LogicalType> logicalTypeOverrides = null)
+            this DataFrame dataFrame, string path, WriterProperties? writerProperties = null,
+            IReadOnlyDictionary<string, LogicalType>? logicalTypeOverrides = null)
         {
             var schemaColumns = dataFrame.Columns.Select(col => GetSchemaColumn(
                 col, logicalTypeOverrides != null && logicalTypeOverrides.TryGetValue(col.Name, out var logicalType) ? logicalType : null)).ToArray();
@@ -37,7 +37,7 @@ namespace ParquetSharp
             fileWriter.Close();
         }
 
-        private static Column GetSchemaColumn(DataFrameColumn column, LogicalType logicalTypeOverride)
+        private static Column GetSchemaColumn(DataFrameColumn column, LogicalType? logicalTypeOverride)
         {
             var dataType = column.DataType;
             var nullable = column.NullCount > 0;
