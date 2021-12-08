@@ -4,10 +4,16 @@ using Microsoft.Data.Analysis;
 namespace ParquetSharp
 {
     /// <summary>
-    /// LogicalColumnReaderVisitor that creates DataFrameColumns
+    /// LogicalColumnReaderVisitor that creates DataFrameColumns of the correct type,
+    /// corresponding to the Parquet LogicalColumnReader type.
     /// </summary>
     internal sealed class ColumnCreator : ILogicalColumnReaderVisitor<DataFrameColumn>
     {
+        /// <summary>
+        /// Create a ColumnCreator
+        /// </summary>
+        /// <param name="columnName">Name of the column to create</param>
+        /// <param name="numRows">Total number of rows in the column</param>
         public ColumnCreator(string columnName, long numRows)
         {
             _columnName = columnName;

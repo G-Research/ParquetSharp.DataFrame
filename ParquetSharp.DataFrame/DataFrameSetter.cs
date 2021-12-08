@@ -8,6 +8,11 @@ namespace ParquetSharp
     /// </summary>
     internal sealed class DataFrameSetter : ILogicalColumnReaderVisitor<bool>
     {
+        /// <summary>
+        /// Create a DataFrameSetter
+        /// </summary>
+        /// <param name="dataFrameColumn">The column to read data into</param>
+        /// <param name="offset">Position to begin inserting data at</param>
         public DataFrameSetter(DataFrameColumn dataFrameColumn, long offset)
         {
             _dataFrameColumn = dataFrameColumn;

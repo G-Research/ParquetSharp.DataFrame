@@ -7,6 +7,9 @@ using Xunit;
 
 namespace ParquetSharp.DataFrame.Test
 {
+    /// <summary>
+    /// Test writing DataFrames to Parquet
+    /// </summary>
     public class DataFrameToParquet
     {
         [Fact]

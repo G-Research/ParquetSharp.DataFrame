@@ -7,6 +7,15 @@ namespace ParquetSharp
 {
     public static class DataFrameExtensions
     {
+        /// <summary>
+        /// Write a DataFrame in Parquet format
+        /// </summary>
+        /// <param name="dataFrame">The DataFrame to write</param>
+        /// <param name="path">Path to write to</param>
+        /// <param name="writerProperties">Optional writer properties that override the default properties</param>
+        /// <param name="logicalTypeOverrides">Mapping from column names to Parquet logical types,
+        /// overriding the default logical types. When writing decimal columns, a logical type must be provided
+        /// to specify the precision and scale to use.</param>
         public static void ToParquet(
             this DataFrame dataFrame, string path, WriterProperties? writerProperties = null,
             IReadOnlyDictionary<string, LogicalType>? logicalTypeOverrides = null)

@@ -2,8 +2,17 @@ using Microsoft.Data.Analysis;
 
 namespace ParquetSharp
 {
+    /// <summary>
+    /// LogicalColumnWriterVisitor that writes data from a DataFrame column
+    /// </summary>
     public class DataFrameWriter : ILogicalColumnWriterVisitor<bool>
     {
+        /// <summary>
+        /// Create a DataFrameWriter
+        /// </summary>
+        /// <param name="dataFrameColumn">The column to read data from</param>
+        /// <param name="offset">The initial position to begin reading from</param>
+        /// <param name="batchSize">The number of values to write</param>
         public DataFrameWriter(DataFrameColumn dataFrameColumn, long offset, int batchSize)
         {
             _dataFrameColumn = dataFrameColumn;
