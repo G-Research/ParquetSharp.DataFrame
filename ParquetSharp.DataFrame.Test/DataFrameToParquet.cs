@@ -15,16 +15,22 @@ namespace ParquetSharp.DataFrame.Test
             int numRows = 10_000;
             var testColumns = GetTestColumns();
             var columns = new List<DataFrameColumn>(testColumns.Length);
+            var logicalTypeOverrides = new Dictionary<string, LogicalType>();
             foreach (var testCol in testColumns)
             {
-                columns.Add(testCol.GetColumn(numRows));
+                var dataFrameCol = testCol.GetColumn(numRows);
+                if (testCol.LogicalTypeOverride != null)
+                {
+                    logicalTypeOverrides[dataFrameCol.Name] = testCol.LogicalTypeOverride;
+                }
+                columns.Add(dataFrameCol);
             }
 
             var dataFrame = new Microsoft.Data.Analysis.DataFrame(columns);
 
             using var dir = new UnitTestDisposableDirectory();
             var filePath = Path.Join(dir.Info.FullName, "test.parquet");
-            dataFrame.ToParquet(filePath);
+            dataFrame.ToParquet(filePath, logicalTypeOverrides: logicalTypeOverrides);
 
             Assert.True(File.Exists(filePath));
 
@@ -87,6 +93,8 @@ namespace ParquetSharp.DataFrame.Test
             public Func<int, DataFrameColumn> GetColumn { get; init; }
 
             public Action<LogicalColumnReader, long> VerifyData { get; init; }
+
+            public LogicalType LogicalTypeOverride { get; init; }
         }
 
         private static TestColumn[] GetTestColumns()
@@ -183,6 +191,7 @@ namespace ParquetSharp.DataFrame.Test
                         new DecimalDataFrameColumn("decimal", Enumerable.Range(0, numRows).Select(i => new decimal(i) / 100)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<decimal>, offset, (i, elem) => Assert.Equal(new decimal(i) / 100, elem)),
+                    LogicalTypeOverride = LogicalType.Decimal(29, 3),
                 },
                 new TestColumn
                 {
@@ -190,6 +199,7 @@ namespace ParquetSharp.DataFrame.Test
                         new DecimalDataFrameColumn("nullable_decimal", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (decimal?) (new decimal(i) / 100))),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<decimal?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (new decimal(i) / 100), elem)),
+                    LogicalTypeOverride = LogicalType.Decimal(29, 3),
                 },
             };
         }

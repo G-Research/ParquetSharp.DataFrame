@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Analysis;
 
@@ -6,9 +7,12 @@ namespace ParquetSharp
 {
     public static class DataFrameExtensions
     {
-        public static void ToParquet(this DataFrame dataFrame, string path, WriterProperties writerProperties = null)
+        public static void ToParquet(
+            this DataFrame dataFrame, string path, WriterProperties writerProperties = null,
+            IReadOnlyDictionary<string, LogicalType> logicalTypeOverrides = null)
         {
-            var schemaColumns = dataFrame.Columns.Select(GetSchemaColumn).ToArray();
+            var schemaColumns = dataFrame.Columns.Select(col => GetSchemaColumn(
+                col, logicalTypeOverrides != null && logicalTypeOverrides.TryGetValue(col.Name, out var logicalType) ? logicalType : null)).ToArray();
             using var fileWriter = writerProperties == null
                 ? new ParquetFileWriter(path, schemaColumns)
                 : new ParquetFileWriter(path, schemaColumns, writerProperties);
@@ -33,16 +37,13 @@ namespace ParquetSharp
             fileWriter.Close();
         }
 
-        private static Column GetSchemaColumn(DataFrameColumn column)
+        private static Column GetSchemaColumn(DataFrameColumn column, LogicalType logicalTypeOverride)
         {
             var dataType = column.DataType;
             var nullable = column.NullCount > 0;
-            LogicalType logicalTypeOverride = null;
-            if (dataType == typeof(decimal))
+            if (dataType == typeof(decimal) && logicalTypeOverride == null)
             {
-                // TODO: Work out how best to set precision and scale. May need to make this configurable?
-                // Parquet stores decimal as int value * 10^(-scale), and precision is number of digits of unscaled value
-                logicalTypeOverride = LogicalType.Decimal(29, 3);
+                throw new ArgumentException($"Logical type override must be specified for decimal column '{column.Name}'");
             }
             if (nullable && dataType.IsValueType)
             {
