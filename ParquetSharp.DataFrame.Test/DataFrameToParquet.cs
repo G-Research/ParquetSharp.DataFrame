@@ -60,7 +60,7 @@ namespace ParquetSharp.DataFrame.Test
         public void TestCustomParquetWriterProperties()
         {
             int numRows = 10_000;
-            var testColumns = GetTestColumns().Where(c => c.GetColumn(1).Name == "int").ToArray();
+            var testColumns = GetTestColumns().Where(c => c.GetColumn(1).Name == "int32").ToArray();
             Assert.Single(testColumns);
 
             using var dir = new UnitTestDisposableDirectory();
@@ -107,70 +107,105 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<int>("int", Enumerable.Range(0, numRows).Select(i => i)),
+                        new ByteDataFrameColumn("uint8", Enumerable.Range(0, numRows).Select(i => (byte) (i % 256))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<byte>, offset, (i, elem) => Assert.Equal(i % 256, elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new SByteDataFrameColumn("int8", Enumerable.Range(0, numRows).Select(i => (sbyte) (i % 256 - 128))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<sbyte>, offset, (i, elem) => Assert.Equal(i % 256 - 128, elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new UInt16DataFrameColumn("uint16", Enumerable.Range(0, numRows).Select(i => (ushort) (i % ushort.MaxValue))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<ushort>, offset, (i, elem) => Assert.Equal(i % ushort.MaxValue, elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new Int16DataFrameColumn("int16", Enumerable.Range(0, numRows).Select(i => (short) (i % short.MaxValue))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<short>, offset, (i, elem) => Assert.Equal(i % short.MaxValue, elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new UInt32DataFrameColumn("uint32", Enumerable.Range(0, numRows).Select(i => (uint) i)),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<uint>, offset, (i, elem) => Assert.Equal(i, elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new Int32DataFrameColumn("int32", Enumerable.Range(0, numRows).Select(i => i)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<int>, offset, (i, elem) => Assert.Equal(i, elem)),
                 },
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<int>("nullable_int", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (int?) null : i)),
+                        new Int32DataFrameColumn("nullable_int32", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (int?) null : i)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<int?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (int?) i, elem)),
                 },
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<long>("long", Enumerable.Range(0, numRows).Select(i => (long) i)),
+                        new Int64DataFrameColumn("int64", Enumerable.Range(0, numRows).Select(i => (long) i)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<long>, offset, Assert.Equal),
                 },
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<long>("nullable_long", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (long?) null : i)),
+                        new Int64DataFrameColumn("nullable_int64", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (long?) null : i)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<long?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : i, elem)),
                 },
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<float>("float", Enumerable.Range(0, numRows).Select(i => (float) i)),
+                        new SingleDataFrameColumn("float", Enumerable.Range(0, numRows).Select(i => (float) i)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<float>, offset, (i, elem) => Assert.Equal(i, elem)),
                 },
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<float>("nullable_float", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (float?) i)),
+                        new SingleDataFrameColumn("nullable_float", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (float?) i)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<float?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (float?) i, elem)),
                 },
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<double>("double", Enumerable.Range(0, numRows).Select(i => (double) i)),
+                        new DoubleDataFrameColumn("double", Enumerable.Range(0, numRows).Select(i => (double) i)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<double>, offset, (i, elem) => Assert.Equal(i, elem)),
                 },
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<double>("nullable_double", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (double?) i)),
+                        new DoubleDataFrameColumn("nullable_double", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (double?) i)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<double?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (double?) i, elem)),
                 },
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<bool>("bool", Enumerable.Range(0, numRows).Select(i => i % 2 == 0)),
+                        new BooleanDataFrameColumn("bool", Enumerable.Range(0, numRows).Select(i => i % 2 == 0)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<bool>, offset, (i, elem) => Assert.Equal(i % 2 == 0, elem)),
                 },
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<bool>("nullable_bool", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (bool?) (i % 2 == 0))),
+                        new BooleanDataFrameColumn("nullable_bool", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (bool?) (i % 2 == 0))),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<bool?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : i % 2 == 0, elem)),
                 },
@@ -187,6 +222,13 @@ namespace ParquetSharp.DataFrame.Test
                         new PrimitiveDataFrameColumn<DateTime>("dateTime", Enumerable.Range(0, numRows).Select(i => new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i))),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<DateTime>, offset, (i, elem) => Assert.Equal(new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i), elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<DateTime>("nullable_dateTime", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (DateTime?) (new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<DateTime?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i), elem)),
                 },
                 new TestColumn
                 {
