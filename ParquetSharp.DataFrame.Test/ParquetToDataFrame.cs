@@ -49,6 +49,82 @@ namespace ParquetSharp.DataFrame.Test
             }
         }
 
+        [Fact]
+        public void TestSpecifyingColumnsToRead()
+        {
+            var testColumns = GetTestColumns();
+            const int numRows = 10_000;
+
+            using var buffer = new ResizableBuffer();
+            using (var output = new BufferOutputStream(buffer))
+            {
+                var columns = testColumns.Select(c => c.ParquetColumn).ToArray();
+                using var fileWriter = new ParquetFileWriter(output, columns);
+                using var rowGroupWriter = fileWriter.AppendRowGroup();
+
+                foreach (var column in testColumns)
+                {
+                    column.WriteColumn(numRows, rowGroupWriter.NextColumn());
+                }
+
+                fileWriter.Close();
+            }
+
+            var columnNames = new[] {"int", "nullable_bool", "float"};
+
+            using (var input = new BufferReader(buffer))
+            {
+                using var fileReader = new ParquetFileReader(input);
+
+                var dataFrame = fileReader.ToDataFrame(columns: columnNames);
+
+                Assert.Equal(columnNames.Length, dataFrame.Columns.Count);
+
+                foreach (var column in testColumns.Where(c => columnNames.Contains(c.ParquetColumn.Name)))
+                {
+                    var dataFrameColumn = dataFrame[column.ParquetColumn.Name];
+                    Assert.IsType(column.ExpectedColumnType, dataFrameColumn);
+                    Assert.Equal(numRows, dataFrameColumn.Length);
+                    Assert.Equal(column.NullCount?.Invoke(numRows) ?? 0, dataFrameColumn.NullCount);
+                    column.VerifyColumn(dataFrameColumn);
+                }
+
+                fileReader.Close();
+            }
+        }
+
+        [Fact]
+        public void ThrowsOnInvalidColumnName()
+        {
+            var testColumns = GetTestColumns();
+            const int numRows = 10_000;
+
+            using var buffer = new ResizableBuffer();
+            using (var output = new BufferOutputStream(buffer))
+            {
+                var columns = testColumns.Select(c => c.ParquetColumn).ToArray();
+                using var fileWriter = new ParquetFileWriter(output, columns);
+                using var rowGroupWriter = fileWriter.AppendRowGroup();
+
+                foreach (var column in testColumns)
+                {
+                    column.WriteColumn(numRows, rowGroupWriter.NextColumn());
+                }
+
+                fileWriter.Close();
+            }
+
+            var columnNames = new[] {"does_not_exist"};
+
+            using (var input = new BufferReader(buffer))
+            {
+                using var fileReader = new ParquetFileReader(input);
+
+                var exception = Assert.Throws<ArgumentException>(() => fileReader.ToDataFrame(columns: columnNames));
+                Assert.Contains("does_not_exist", exception.Message);
+            }
+        }
+
         private readonly struct TestColumn
         {
             public Column ParquetColumn { get; init; }
