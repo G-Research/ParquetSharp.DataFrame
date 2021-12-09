@@ -73,7 +73,7 @@ namespace ParquetSharp
                     return new DecimalDataFrameColumn(_columnName, _numRows);
                 case LogicalColumnReader<Date>:
                 case LogicalColumnReader<Date?>:
-                    return new Int32DataFrameColumn(_columnName, _numRows);
+                    return new PrimitiveDataFrameColumn<Date>(_columnName, _numRows);
                 case LogicalColumnReader<TimeSpan>:
                 case LogicalColumnReader<TimeSpan?>:
                     return new PrimitiveDataFrameColumn<TimeSpan>(_columnName, _numRows);

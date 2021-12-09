@@ -247,6 +247,20 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<Date>("date", Enumerable.Range(0, numRows).Select(i => new Date(i))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<Date>, offset, (i, elem) => Assert.Equal(new Date((int) i), elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<Date>("nullable_date", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (Date?) new Date(i))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<Date?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : new Date((int) i), elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
                         new DecimalDataFrameColumn("decimal", Enumerable.Range(0, numRows).Select(i => new decimal(i) / 100)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<decimal>, offset, (i, elem) => Assert.Equal(new decimal(i) / 100, elem)),

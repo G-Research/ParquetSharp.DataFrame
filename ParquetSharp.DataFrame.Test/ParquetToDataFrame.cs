@@ -480,7 +480,7 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     ParquetColumn = new Column<Date>("date"),
-                    ExpectedColumnType = typeof(Int32DataFrameColumn),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<Date>),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<Date>();
@@ -490,14 +490,14 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i, column[i]);
+                            Assert.Equal(new Date(i), column[i]);
                         }
                     }
                 },
                 new TestColumn
                 {
                     ParquetColumn = new Column<Date?>("nullable_date"),
-                    ExpectedColumnType = typeof(Int32DataFrameColumn),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<Date>),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<Date?>();
@@ -507,7 +507,7 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i, column[i]);
+                            Assert.Equal(new Date(i), column[i]);
                         }
                     }
                 },
