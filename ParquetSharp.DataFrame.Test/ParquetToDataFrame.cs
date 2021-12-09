@@ -442,6 +442,44 @@ namespace ParquetSharp.DataFrame.Test
                 },
                 new TestColumn
                 {
+                    ParquetColumn = new Column<DateTimeNanos>("dateTimeNanos"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<DateTimeNanos>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<DateTimeNanos>();
+                        logicalWriter.WriteBatch(
+                            Enumerable.Range(0, numRows)
+                                .Select(i => new DateTimeNanos(i)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(new DateTimeNanos(i), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<DateTimeNanos?>("nullable_dateTimeNanos"),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<DateTimeNanos>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<DateTimeNanos?>();
+                        logicalWriter.WriteBatch(
+                            Enumerable.Range(0, numRows)
+                                .Select(i => (DateTimeNanos?) new DateTimeNanos(i)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(new DateTimeNanos(i), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
                     ParquetColumn = new Column<decimal>("decimal", LogicalType.Decimal(29, 3)),
                     ExpectedColumnType = typeof(DecimalDataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
@@ -559,6 +597,40 @@ namespace ParquetSharp.DataFrame.Test
                         for (int i = 0; i < column.Length; ++i)
                         {
                             Assert.Equal(TimeSpan.FromMilliseconds(i), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<TimeSpanNanos>("time_ns", LogicalType.Time(isAdjustedToUtc: true, TimeUnit.Nanos)),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<TimeSpanNanos>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<TimeSpanNanos>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => new TimeSpanNanos(i)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(new TimeSpanNanos(i), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<TimeSpanNanos?>("nullable_time_ns", LogicalType.Time(isAdjustedToUtc: true, TimeUnit.Nanos)),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<TimeSpanNanos>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<TimeSpanNanos?>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (TimeSpanNanos?) new TimeSpanNanos(i)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(new TimeSpanNanos(i), column[i]);
                         }
                     }
                 },

@@ -68,6 +68,9 @@ namespace ParquetSharp
                 case LogicalColumnReader<DateTime>:
                 case LogicalColumnReader<DateTime?>:
                     return new PrimitiveDataFrameColumn<DateTime>(_columnName, _numRows);
+                case LogicalColumnReader<DateTimeNanos>:
+                case LogicalColumnReader<DateTimeNanos?>:
+                    return new PrimitiveDataFrameColumn<DateTimeNanos>(_columnName, _numRows);
                 case LogicalColumnReader<decimal>:
                 case LogicalColumnReader<decimal?>:
                     return new DecimalDataFrameColumn(_columnName, _numRows);
@@ -77,6 +80,9 @@ namespace ParquetSharp
                 case LogicalColumnReader<TimeSpan>:
                 case LogicalColumnReader<TimeSpan?>:
                     return new PrimitiveDataFrameColumn<TimeSpan>(_columnName, _numRows);
+                case LogicalColumnReader<TimeSpanNanos>:
+                case LogicalColumnReader<TimeSpanNanos?>:
+                    return new PrimitiveDataFrameColumn<TimeSpanNanos>(_columnName, _numRows);
                 default:
                     throw new NotImplementedException($"Unsupported column logical type: {typeof(TElement)}");
             }

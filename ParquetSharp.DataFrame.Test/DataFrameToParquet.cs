@@ -261,6 +261,34 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<DateTimeNanos>("dateTimeNanos", Enumerable.Range(0, numRows).Select(i => new DateTimeNanos(i))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<DateTimeNanos>, offset, (i, elem) => Assert.Equal(new DateTimeNanos(i), elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<DateTimeNanos>("nullable_dateTimeNanos", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (DateTimeNanos?) new DateTimeNanos(i))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<DateTimeNanos?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : new DateTimeNanos(i), elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<TimeSpanNanos>("timeSpanNanos", Enumerable.Range(0, numRows).Select(i => new TimeSpanNanos(i))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<TimeSpanNanos>, offset, (i, elem) => Assert.Equal(new TimeSpanNanos(i), elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<TimeSpanNanos>("nullable_timeSpanNanos", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (TimeSpanNanos?) new TimeSpanNanos(i))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<TimeSpanNanos?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : new TimeSpanNanos(i), elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
                         new DecimalDataFrameColumn("decimal", Enumerable.Range(0, numRows).Select(i => new decimal(i) / 100)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<decimal>, offset, (i, elem) => Assert.Equal(new decimal(i) / 100, elem)),
