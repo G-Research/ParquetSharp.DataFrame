@@ -70,6 +70,9 @@ namespace ParquetSharp
                 case LogicalColumnReader<decimal>:
                 case LogicalColumnReader<decimal?>:
                     return new DecimalDataFrameColumn(_columnName, _numRows);
+                case LogicalColumnReader<Date>:
+                case LogicalColumnReader<Date?>:
+                    return new Int32DataFrameColumn(_columnName, _numRows);
                 default:
                     throw new NotImplementedException($"Unsupported column logical type: {typeof(TElement)}");
             }

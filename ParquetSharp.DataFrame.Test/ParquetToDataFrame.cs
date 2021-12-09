@@ -477,6 +477,40 @@ namespace ParquetSharp.DataFrame.Test
                     },
                     NullCount = numRows => numRows / 10,
                 },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<Date>("date"),
+                    ExpectedColumnType = typeof(Int32DataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<Date>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => new Date(i)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i, column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<Date?>("nullable_date"),
+                    ExpectedColumnType = typeof(Int32DataFrameColumn),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<Date?>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (Date?) new Date(i)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(i, column[i]);
+                        }
+                    }
+                },
             };
         }
 

@@ -23,16 +23,40 @@ namespace ParquetSharp
         {
             var buffer = new TElement[columnReader.BufferLength];
             long offset = 0;
+            var converter = GetConverter<TElement>();
             while (columnReader.HasNext)
             {
                 var read = columnReader.ReadBatch((Span<TElement>) buffer);
-                for (var i = 0; i != read; ++i)
+                if (converter == null)
                 {
-                    _dataFrameColumn[_offset + offset + i] = buffer[i];
+                    for (var i = 0; i != read; ++i)
+                    {
+                        _dataFrameColumn[_offset + offset + i] = buffer[i];
+                    }
+                }
+                else
+                {
+                    for (var i = 0; i != read; ++i)
+                    {
+                        _dataFrameColumn[_offset + offset + i] = converter(buffer[i]);
+                    }
                 }
                 offset += read;
             }
             return true;
+        }
+
+        private static Func<TElement, object?>? GetConverter<TElement>()
+        {
+            if (typeof(TElement) == typeof(Date))
+            {
+                return el => ((Date) (object) el!).Days;
+            }
+            if (typeof(TElement) == typeof(Date?))
+            {
+                return el => ((Date?) (object?) el)?.Days ?? null;
+            }
+            return null;
         }
 
         private readonly DataFrameColumn _dataFrameColumn;
