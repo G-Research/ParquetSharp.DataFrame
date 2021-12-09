@@ -511,6 +511,57 @@ namespace ParquetSharp.DataFrame.Test
                         }
                     }
                 },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<TimeSpan>("time_ms", LogicalType.Time(isAdjustedToUtc: true, TimeUnit.Millis)),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<TimeSpan>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<TimeSpan>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => TimeSpan.FromMilliseconds(i)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(TimeSpan.FromMilliseconds(i), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<TimeSpan>("time_us", LogicalType.Time(isAdjustedToUtc: true, TimeUnit.Micros)),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<TimeSpan>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<TimeSpan>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => TimeSpan.FromMilliseconds(i)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(TimeSpan.FromMilliseconds(i), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<TimeSpan?>("nullable_time_us", LogicalType.Time(isAdjustedToUtc: true, TimeUnit.Micros)),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<TimeSpan>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<TimeSpan?>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (TimeSpan?) TimeSpan.FromMilliseconds(i)).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(TimeSpan.FromMilliseconds(i), column[i]);
+                        }
+                    }
+                },
             };
         }
 

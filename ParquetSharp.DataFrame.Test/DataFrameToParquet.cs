@@ -233,6 +233,20 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<TimeSpan>("timeSpan", Enumerable.Range(0, numRows).Select(i => TimeSpan.FromMilliseconds(i))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<TimeSpan>, offset, (i, elem) => Assert.Equal(TimeSpan.FromMilliseconds(i), elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new PrimitiveDataFrameColumn<TimeSpan>("nullable_timeSpan", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (TimeSpan?) TimeSpan.FromMilliseconds(i))),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<TimeSpan?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : TimeSpan.FromMilliseconds(i), elem)),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
                         new DecimalDataFrameColumn("decimal", Enumerable.Range(0, numRows).Select(i => new decimal(i) / 100)),
                     VerifyData = (reader, offset) =>
                         VerifyData(reader as LogicalColumnReader<decimal>, offset, (i, elem) => Assert.Equal(new decimal(i) / 100, elem)),

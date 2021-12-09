@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Microsoft.Data.Analysis;
 
 namespace ParquetSharp
@@ -73,6 +74,9 @@ namespace ParquetSharp
                 case LogicalColumnReader<Date>:
                 case LogicalColumnReader<Date?>:
                     return new Int32DataFrameColumn(_columnName, _numRows);
+                case LogicalColumnReader<TimeSpan>:
+                case LogicalColumnReader<TimeSpan?>:
+                    return new PrimitiveDataFrameColumn<TimeSpan>(_columnName, _numRows);
                 default:
                     throw new NotImplementedException($"Unsupported column logical type: {typeof(TElement)}");
             }

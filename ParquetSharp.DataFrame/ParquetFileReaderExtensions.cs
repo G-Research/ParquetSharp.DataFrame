@@ -46,7 +46,7 @@ namespace ParquetSharp
                 for (var colIdx = 0; colIdx < numColumns; ++colIdx)
                 {
                     using var columnReader = rowGroupReader.Column(columnIndexMap[colIdx]);
-                    using var logicalReader = columnReader.LogicalReader();
+                    using var logicalReader = GetLogicalReader(columnReader);
 
                     if (rowGroupIdx == 0)
                     {
@@ -62,6 +62,20 @@ namespace ParquetSharp
             }
 
             return new DataFrame(dataFrameColumns);
+        }
+
+        private static LogicalColumnReader GetLogicalReader(ColumnReader columnReader)
+        {
+            // Override the logical type to use when reading dates, and just read these
+            // as the underlying physical integer type, as there isn't a directly corresponding DataFrame column type
+            // that can handle dates and times.
+            if (columnReader.ColumnDescriptor.LogicalType is DateLogicalType)
+            {
+                return columnReader.ColumnDescriptor.MaxDefinitionLevel == 0
+                    ? columnReader.LogicalReaderOverride<int>()
+                    : columnReader.LogicalReaderOverride<int?>();
+            }
+            return columnReader.LogicalReader();
         }
 
         private static int FindColumnIndex(string column, SchemaDescriptor schema)
