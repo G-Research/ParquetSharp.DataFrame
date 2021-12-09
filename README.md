@@ -56,11 +56,13 @@ using (var propertiesBuilder = new WriterPropertiesBuilder())
 The logical type to use when writing a column can optionally be overridden.
 This is required when writing decimal columns, as you must specify the precision and scale to be used
 (see the [Parquet documentation](https://github.com/apache/parquet-format/blob/master/LogicalTypes.md#decimal) for more details).
-For example:
+This also allows writing an integer column as a Parquet date or time.
 
 ```C#
 dataFrame.ToParquet(parquet_file_path, logicalTypeOverrides: new Dictionary<string, LogicalType>
 {
-    {"decimal_col_name", LogicalType.Decimal(precision: 29, scale: 3)},
+    {"decimal_column", LogicalType.Decimal(precision: 29, scale: 3)},
+    {"date_column", LogicalType.Date()},
+    {"time_column", LogicalType.Time(isAdjustedToUtc: true, TimeUnit.Millis)},
 });
 ```

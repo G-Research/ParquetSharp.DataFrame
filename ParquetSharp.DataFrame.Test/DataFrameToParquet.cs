@@ -246,6 +246,30 @@ namespace ParquetSharp.DataFrame.Test
                         VerifyData(reader as LogicalColumnReader<decimal?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (new decimal(i) / 100), elem)),
                     LogicalTypeOverride = LogicalType.Decimal(29, 3),
                 },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new Int32DataFrameColumn("int_as_byte", Enumerable.Range(0, numRows).Select(i => i % 256)),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<byte>, offset, (i, elem) => Assert.Equal(i % 256, elem)),
+                    LogicalTypeOverride = LogicalType.Int(8, false),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new Int32DataFrameColumn("int_as_date", Enumerable.Range(0, numRows).Select(i => i)),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<Date>, offset, (i, elem) => Assert.Equal(new Date(1970, 1, 1).AddDays((int) i), elem)),
+                    LogicalTypeOverride = LogicalType.Date(),
+                },
+                new TestColumn
+                {
+                    GetColumn = numRows =>
+                        new Int32DataFrameColumn("int_as_time", Enumerable.Range(0, numRows).Select(i => i)),
+                    VerifyData = (reader, offset) =>
+                        VerifyData(reader as LogicalColumnReader<TimeSpan>, offset, (i, elem) => Assert.Equal(TimeSpan.FromMilliseconds(i), elem)),
+                    LogicalTypeOverride = LogicalType.Time(isAdjustedToUtc: true, TimeUnit.Millis),
+                },
             };
         }
 
