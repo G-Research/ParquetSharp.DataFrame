@@ -5,7 +5,7 @@ namespace ParquetSharp
     /// <summary>
     /// LogicalColumnWriterVisitor that writes data from a DataFrame column
     /// </summary>
-    public class DataFrameWriter : ILogicalColumnWriterVisitor<bool>
+    internal sealed class DataFrameWriter : ILogicalColumnWriterVisitor<Unit>
     {
         /// <summary>
         /// Create a DataFrameWriter
@@ -20,7 +20,7 @@ namespace ParquetSharp
             _batchSize = batchSize;
         }
 
-        public bool OnLogicalColumnWriter<TValue>(LogicalColumnWriter<TValue> columnWriter)
+        public Unit OnLogicalColumnWriter<TValue>(LogicalColumnWriter<TValue> columnWriter)
         {
             var values = new TValue[_batchSize];
             for (var i = 0; i < _batchSize; ++i)
@@ -29,7 +29,7 @@ namespace ParquetSharp
             }
 
             columnWriter.WriteBatch(values);
-            return true;
+            return Unit.Instance;
         }
 
         private readonly DataFrameColumn _dataFrameColumn;

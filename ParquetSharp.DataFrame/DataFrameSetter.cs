@@ -6,7 +6,7 @@ namespace ParquetSharp
     /// <summary>
     /// LogicalColumnReaderVisitor that sets values in a DataFrameColumn
     /// </summary>
-    internal sealed class DataFrameSetter : ILogicalColumnReaderVisitor<bool>
+    internal sealed class DataFrameSetter : ILogicalColumnReaderVisitor<Unit>
     {
         /// <summary>
         /// Create a DataFrameSetter
@@ -19,7 +19,7 @@ namespace ParquetSharp
             _offset = offset;
         }
 
-        public bool OnLogicalColumnReader<TElement>(LogicalColumnReader<TElement> columnReader)
+        public Unit OnLogicalColumnReader<TElement>(LogicalColumnReader<TElement> columnReader)
         {
             var buffer = new TElement[columnReader.BufferLength];
             long offset = 0;
@@ -34,7 +34,7 @@ namespace ParquetSharp
                 offset += read;
             }
 
-            return true;
+            return Unit.Instance;
         }
 
         private readonly DataFrameColumn _dataFrameColumn;
