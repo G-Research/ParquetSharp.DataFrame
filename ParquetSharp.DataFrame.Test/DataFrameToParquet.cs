@@ -93,7 +93,7 @@ namespace ParquetSharp.DataFrame.Test
             }
         }
 
-        private readonly struct TestColumn
+        private struct TestColumn
         {
             public Func<int, DataFrameColumn> GetColumn { get; init; }
 

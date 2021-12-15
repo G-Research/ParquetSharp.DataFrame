@@ -128,7 +128,7 @@ namespace ParquetSharp.DataFrame.Test
             }
         }
 
-        private readonly struct TestColumn
+        private struct TestColumn
         {
             public Column ParquetColumn { get; init; }
             public Type ExpectedColumnType { get; init; }
