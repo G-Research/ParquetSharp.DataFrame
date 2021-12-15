@@ -167,7 +167,7 @@ namespace ParquetSharp.DataFrame.Test
                     GetColumn = numRows =>
                         new Int64DataFrameColumn("nullable_int64", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (long?)null : i)),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<long?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : i, elem)),
+                        VerifyData(reader as LogicalColumnReader<long?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (long?)i, elem)),
                 },
                 new TestColumn
                 {
@@ -181,7 +181,7 @@ namespace ParquetSharp.DataFrame.Test
                     GetColumn = numRows =>
                         new SingleDataFrameColumn("nullable_float", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (float?)i)),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<float?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : i, elem)),
+                        VerifyData(reader as LogicalColumnReader<float?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (float?)i, elem)),
                 },
                 new TestColumn
                 {
@@ -195,7 +195,7 @@ namespace ParquetSharp.DataFrame.Test
                     GetColumn = numRows =>
                         new DoubleDataFrameColumn("nullable_double", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (double?)i)),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<double?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : i, elem)),
+                        VerifyData(reader as LogicalColumnReader<double?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (double?)i, elem)),
                 },
                 new TestColumn
                 {
@@ -209,7 +209,7 @@ namespace ParquetSharp.DataFrame.Test
                     GetColumn = numRows =>
                         new BooleanDataFrameColumn("nullable_bool", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (bool?)(i % 2 == 0))),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<bool?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : i % 2 == 0, elem)),
+                        VerifyData(reader as LogicalColumnReader<bool?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (bool?)(i % 2 == 0), elem)),
                 },
                 new TestColumn
                 {
@@ -228,9 +228,11 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<DateTime>("nullable_dateTime", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (DateTime?)(new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)))),
+                        new PrimitiveDataFrameColumn<DateTime>("nullable_dateTime", Enumerable.Range(0, numRows).Select(
+                            i => i % 10 == 0 ? null : (DateTime?)(new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)))),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<DateTime?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i), elem)),
+                        VerifyData(reader as LogicalColumnReader<DateTime?>, offset, (i, elem) =>
+                            Assert.Equal(i % 10 == 0 ? null : (DateTime?)(new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)), elem)),
                 },
                 new TestColumn
                 {
@@ -242,9 +244,11 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<TimeSpan>("nullable_timeSpan", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (TimeSpan?)TimeSpan.FromMilliseconds(i))),
+                        new PrimitiveDataFrameColumn<TimeSpan>("nullable_timeSpan", Enumerable.Range(0, numRows).Select(
+                            i => i % 10 == 0 ? null : (TimeSpan?)TimeSpan.FromMilliseconds(i))),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<TimeSpan?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : TimeSpan.FromMilliseconds(i), elem)),
+                        VerifyData(reader as LogicalColumnReader<TimeSpan?>, offset, (i, elem) => Assert.Equal(
+                            i % 10 == 0 ? null : (TimeSpan?)TimeSpan.FromMilliseconds(i), elem)),
                 },
                 new TestColumn
                 {
@@ -258,7 +262,7 @@ namespace ParquetSharp.DataFrame.Test
                     GetColumn = numRows =>
                         new PrimitiveDataFrameColumn<Date>("nullable_date", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (Date?)new Date(i))),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<Date?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : new Date((int)i), elem)),
+                        VerifyData(reader as LogicalColumnReader<Date?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (Date?)new Date((int)i), elem)),
                 },
                 new TestColumn
                 {
@@ -270,9 +274,11 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<DateTimeNanos>("nullable_dateTimeNanos", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (DateTimeNanos?)new DateTimeNanos(i))),
+                        new PrimitiveDataFrameColumn<DateTimeNanos>("nullable_dateTimeNanos", Enumerable.Range(0, numRows).Select(
+                            i => i % 10 == 0 ? null : (DateTimeNanos?)new DateTimeNanos(i))),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<DateTimeNanos?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : new DateTimeNanos(i), elem)),
+                        VerifyData(reader as LogicalColumnReader<DateTimeNanos?>, offset, (i, elem) => Assert.Equal(
+                            i % 10 == 0 ? null : (DateTimeNanos?)new DateTimeNanos(i), elem)),
                 },
                 new TestColumn
                 {
@@ -284,9 +290,11 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new PrimitiveDataFrameColumn<TimeSpanNanos>("nullable_timeSpanNanos", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (TimeSpanNanos?)new TimeSpanNanos(i))),
+                        new PrimitiveDataFrameColumn<TimeSpanNanos>("nullable_timeSpanNanos", Enumerable.Range(0, numRows).Select(
+                            i => i % 10 == 0 ? null : (TimeSpanNanos?)new TimeSpanNanos(i))),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<TimeSpanNanos?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : new TimeSpanNanos(i), elem)),
+                        VerifyData(reader as LogicalColumnReader<TimeSpanNanos?>, offset, (i, elem) => Assert.Equal(
+                            i % 10 == 0 ? null : (TimeSpanNanos?)new TimeSpanNanos(i), elem)),
                 },
                 new TestColumn
                 {
@@ -299,9 +307,11 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     GetColumn = numRows =>
-                        new DecimalDataFrameColumn("nullable_decimal", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (decimal?)(new decimal(i) / 100))),
+                        new DecimalDataFrameColumn("nullable_decimal", Enumerable.Range(0, numRows).Select(
+                            i => i % 10 == 0 ? null : (decimal?)(new decimal(i) / 100))),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<decimal?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (new decimal(i) / 100), elem)),
+                        VerifyData(reader as LogicalColumnReader<decimal?>, offset, (i, elem) => Assert.Equal(
+                            i % 10 == 0 ? null : (decimal?)(new decimal(i) / 100), elem)),
                     LogicalTypeOverride = LogicalType.Decimal(29, 3),
                 },
                 new TestColumn
