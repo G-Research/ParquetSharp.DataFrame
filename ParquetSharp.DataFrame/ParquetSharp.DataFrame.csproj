@@ -1,9 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net471;netstandard2.1</TargetFrameworks>
+    <LangVersion>9.0</LangVersion>
+    <AssemblyName>ParquetSharp.DataFrame</AssemblyName>
     <RootNamespace>ParquetSharp</RootNamespace>
     <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
