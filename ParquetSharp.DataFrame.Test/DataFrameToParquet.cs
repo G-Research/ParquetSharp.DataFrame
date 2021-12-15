@@ -179,7 +179,7 @@ namespace ParquetSharp.DataFrame.Test
                     GetColumn = numRows =>
                         new SingleDataFrameColumn("nullable_float", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (float?) i)),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<float?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (float?) i, elem)),
+                        VerifyData(reader as LogicalColumnReader<float?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : i, elem)),
                 },
                 new TestColumn
                 {
@@ -193,7 +193,7 @@ namespace ParquetSharp.DataFrame.Test
                     GetColumn = numRows =>
                         new DoubleDataFrameColumn("nullable_double", Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? null : (double?) i)),
                     VerifyData = (reader, offset) =>
-                        VerifyData(reader as LogicalColumnReader<double?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : (double?) i, elem)),
+                        VerifyData(reader as LogicalColumnReader<double?>, offset, (i, elem) => Assert.Equal(i % 10 == 0 ? null : i, elem)),
                 },
                 new TestColumn
                 {

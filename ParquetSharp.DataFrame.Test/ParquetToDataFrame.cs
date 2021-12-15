@@ -239,7 +239,7 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? (int?) null : i, column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (int?) i, column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -309,7 +309,7 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? (float?) null : i, column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (float?) i, column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -344,7 +344,7 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? (double?) null : i, column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (double?) i, column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -396,7 +396,7 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? (bool?) null : (i % 2 == 0), column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (bool?) (i % 2 == 0), column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -435,7 +435,7 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? (DateTime?) null : new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i), column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (DateTime?) new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i), column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -510,7 +510,7 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? (decimal?) null : new decimal(i) / 100, column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (decimal?) new decimal(i) / 100, column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
