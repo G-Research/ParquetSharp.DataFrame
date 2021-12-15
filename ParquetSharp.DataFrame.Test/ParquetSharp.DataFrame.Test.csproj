@@ -9,6 +9,7 @@
     <RootNamespace>ParquetSharp.DataFrame.Test</RootNamespace>
     <IsPackable>false</IsPackable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PlatformTarget Condition="'$(TargetFramework)'=='net472'">x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
