@@ -73,7 +73,7 @@ namespace ParquetSharp.DataFrame.Test
                 fileWriter.Close();
             }
 
-            var columnNames = new[] {"int", "nullable_bool", "float"};
+            var columnNames = new[] { "int", "nullable_bool", "float" };
 
             using (var input = new BufferReader(buffer))
             {
@@ -117,7 +117,7 @@ namespace ParquetSharp.DataFrame.Test
                 fileWriter.Close();
             }
 
-            var columnNames = new[] {"does_not_exist"};
+            var columnNames = new[] { "does_not_exist" };
 
             using (var input = new BufferReader(buffer))
             {
@@ -131,15 +131,15 @@ namespace ParquetSharp.DataFrame.Test
         private readonly struct TestColumn
         {
             public Column ParquetColumn { get; init; }
-            public Type ExpectedColumnType { get; init;  }
-            public Action<int, ColumnWriter> WriteColumn { get; init;  }
-            public Action<DataFrameColumn> VerifyColumn { get; init;  }
+            public Type ExpectedColumnType { get; init; }
+            public Action<int, ColumnWriter> WriteColumn { get; init; }
+            public Action<DataFrameColumn> VerifyColumn { get; init; }
             public Func<long, long>? NullCount { get; init; }
         }
 
         private static TestColumn[] GetTestColumns()
         {
-            return new []
+            return new[]
             {
                 new TestColumn
                 {
@@ -148,13 +148,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<byte>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (byte) (i % 256)).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (byte)(i % 256)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal((byte) (i % 256), column[i]);
+                            Assert.Equal((byte)(i % 256), column[i]);
                         }
                     }
                 },
@@ -165,13 +165,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<sbyte>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (sbyte) (i % 256 - 128)).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (sbyte)(i % 256 - 128)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal((sbyte) (i % 256 - 128), column[i]);
+                            Assert.Equal((sbyte)(i % 256 - 128), column[i]);
                         }
                     }
                 },
@@ -182,13 +182,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<ushort>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (ushort) (i % ushort.MaxValue)).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (ushort)(i % ushort.MaxValue)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal((ushort) (i % ushort.MaxValue), column[i]);
+                            Assert.Equal((ushort)(i % ushort.MaxValue), column[i]);
                         }
                     }
                 },
@@ -199,13 +199,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<short>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (short) (i % short.MaxValue)).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (short)(i % short.MaxValue)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal((short) (i % short.MaxValue), column[i]);
+                            Assert.Equal((short)(i % short.MaxValue), column[i]);
                         }
                     }
                 },
@@ -233,13 +233,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<int?>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (int?) null : i).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (int?)null : i).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? null : (int?) i, column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (int?)i, column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -251,13 +251,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<long>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (long) i).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (long)i).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal((long) i, column[i]);
+                            Assert.Equal((long)i, column[i]);
                         }
                     }
                 },
@@ -268,13 +268,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<long?>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (long?) null : i).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (long?)null : i).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (long i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? null : (long?) i, column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (long?)i, column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -286,13 +286,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<float>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (float) i).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (float)i).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal((float) i, column[i]);
+                            Assert.Equal((float)i, column[i]);
                         }
                     }
                 },
@@ -303,13 +303,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<float?>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (float?) null : i).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (float?)null : i).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? null : (float?) i, column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (float?)i, column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -321,13 +321,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<double>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (double) i).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (double)i).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal((double) i, column[i]);
+                            Assert.Equal((double)i, column[i]);
                         }
                     }
                 },
@@ -338,13 +338,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<double?>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (double?) null : i).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (double?)null : i).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? null : (double?) i, column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (double?)i, column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -390,13 +390,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<bool?>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (bool?) null : (i % 2 == 0)).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => i % 10 == 0 ? (bool?)null : (i % 2 == 0)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? null : (bool?) (i % 2 == 0), column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (bool?)(i % 2 == 0), column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -429,13 +429,13 @@ namespace ParquetSharp.DataFrame.Test
                         using var logicalWriter = columnWriter.LogicalWriter<DateTime?>();
                         logicalWriter.WriteBatch(
                             Enumerable.Range(0, numRows)
-                                .Select(i => i % 10 == 0 ? (DateTime?) null : new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)).ToArray());
+                                .Select(i => i % 10 == 0 ? (DateTime?)null : new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? null : (DateTime?) new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i), column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (DateTime?)new DateTime(2021, 12, 8) + TimeSpan.FromSeconds(i), column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -468,7 +468,7 @@ namespace ParquetSharp.DataFrame.Test
                         using var logicalWriter = columnWriter.LogicalWriter<DateTimeNanos?>();
                         logicalWriter.WriteBatch(
                             Enumerable.Range(0, numRows)
-                                .Select(i => (DateTimeNanos?) new DateTimeNanos(i)).ToArray());
+                                .Select(i => (DateTimeNanos?)new DateTimeNanos(i)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
@@ -486,7 +486,7 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<decimal>();
                         logicalWriter.WriteBatch(Enumerable.Range(0, numRows)
-                                .Select(i => new decimal(i) / 100).ToArray());
+                            .Select(i => new decimal(i) / 100).ToArray());
                     },
                     VerifyColumn = column =>
                     {
@@ -504,13 +504,13 @@ namespace ParquetSharp.DataFrame.Test
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<decimal?>();
                         logicalWriter.WriteBatch(Enumerable.Range(0, numRows)
-                                .Select(i => i % 10 == 0 ? (decimal?) null : new decimal(i) / 100).ToArray());
+                            .Select(i => i % 10 == 0 ? (decimal?)null : new decimal(i) / 100).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(i % 10 == 0 ? null : (decimal?) new decimal(i) / 100, column[i]);
+                            Assert.Equal(i % 10 == 0 ? null : (decimal?)new decimal(i) / 100, column[i]);
                         }
                     },
                     NullCount = numRows => numRows / 10,
@@ -539,7 +539,7 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<Date?>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (Date?) new Date(i)).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (Date?)new Date(i)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
@@ -590,7 +590,7 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<TimeSpan?>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (TimeSpan?) TimeSpan.FromMilliseconds(i)).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (TimeSpan?)TimeSpan.FromMilliseconds(i)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
@@ -624,7 +624,7 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<TimeSpanNanos?>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (TimeSpanNanos?) new TimeSpanNanos(i)).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (TimeSpanNanos?)new TimeSpanNanos(i)).ToArray());
                     },
                     VerifyColumn = column =>
                     {
@@ -636,6 +636,5 @@ namespace ParquetSharp.DataFrame.Test
                 },
             };
         }
-
     }
 }

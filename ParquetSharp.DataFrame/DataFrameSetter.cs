@@ -25,13 +25,15 @@ namespace ParquetSharp
             long offset = 0;
             while (columnReader.HasNext)
             {
-                var read = columnReader.ReadBatch((Span<TElement>) buffer);
+                var read = columnReader.ReadBatch((Span<TElement>)buffer);
                 for (var i = 0; i != read; ++i)
                 {
                     _dataFrameColumn[_offset + offset + i] = buffer[i];
                 }
+
                 offset += read;
             }
+
             return true;
         }
 

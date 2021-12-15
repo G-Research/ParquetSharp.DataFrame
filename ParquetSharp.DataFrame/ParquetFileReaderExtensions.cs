@@ -58,6 +58,7 @@ namespace ParquetSharp
                     // Read column data
                     logicalReader.Apply(new DataFrameSetter(dataFrameColumns[colIdx], offset));
                 }
+
                 offset += rowGroupReader.MetaData.NumRows;
             }
 
@@ -71,6 +72,7 @@ namespace ParquetSharp
             {
                 throw new ArgumentException($"Invalid column path '{column}'");
             }
+
             return index;
         }
     }

@@ -32,7 +32,7 @@ namespace ParquetSharp
 
             while (offset < numRows)
             {
-                var batchSize = (int) Math.Min(numRows - offset, rowGroupSize);
+                var batchSize = (int)Math.Min(numRows - offset, rowGroupSize);
                 using var rowGroupWriter = fileWriter.AppendRowGroup();
                 foreach (var dataFrameColumn in dataFrame.Columns)
                 {
@@ -40,6 +40,7 @@ namespace ParquetSharp
                     using var logicalWriter = columnWriter.LogicalWriter();
                     logicalWriter.Apply(new DataFrameWriter(dataFrameColumn, offset, batchSize));
                 }
+
                 offset += batchSize;
             }
 
@@ -54,10 +55,12 @@ namespace ParquetSharp
             {
                 throw new ArgumentException($"Logical type override must be specified for decimal column '{column.Name}'");
             }
+
             if (nullable && dataType.IsValueType)
             {
                 dataType = typeof(Nullable<>).MakeGenericType(dataType);
             }
+
             return new Column(dataType, column.Name, logicalTypeOverride);
         }
     }
