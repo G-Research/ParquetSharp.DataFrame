@@ -33,7 +33,7 @@ namespace ParquetSharp.DataFrame.Test
             var dataFrame = new Microsoft.Data.Analysis.DataFrame(columns);
 
             using var dir = new UnitTestDisposableDirectory();
-            var filePath = Path.Join(dir.Info.FullName, "test.parquet");
+            var filePath = Path.Combine(dir.Info.FullName, "test.parquet");
             dataFrame.ToParquet(filePath, logicalTypeOverrides: logicalTypeOverrides);
 
             Assert.True(File.Exists(filePath));
@@ -66,7 +66,7 @@ namespace ParquetSharp.DataFrame.Test
             Assert.Single(testColumns);
 
             using var dir = new UnitTestDisposableDirectory();
-            var filePath = Path.Join(dir.Info.FullName, "test.parquet");
+            var filePath = Path.Combine(dir.Info.FullName, "test.parquet");
 
             {
                 var columns = new[] { testColumns[0].GetColumn(numRows) };

@@ -7,7 +7,7 @@ namespace ParquetSharp.DataFrame.Test
     {
         public UnitTestDisposableDirectory()
         {
-            var path = Path.Join(Path.GetTempPath(), Path.GetRandomFileName());
+            var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Info = new DirectoryInfo(path);
             Info.Create();
         }
