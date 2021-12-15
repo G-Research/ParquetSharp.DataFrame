@@ -97,6 +97,47 @@ namespace ParquetSharp.DataFrame.Test
         }
 
         [Fact]
+        public void TestSpecifyingRowGroupsToRead()
+        {
+            const int rowsPerRowGroup = 1024;
+            const int numRowGroups = 10;
+
+            using var buffer = new ResizableBuffer();
+            using (var output = new BufferOutputStream(buffer))
+            {
+                var columns = new Column[] { new Column<int>("col") };
+                using var fileWriter = new ParquetFileWriter(output, columns);
+
+                for (var rowGroupIdx = 0; rowGroupIdx < numRowGroups; ++rowGroupIdx)
+                {
+                    using var rowGroupWriter = fileWriter.AppendRowGroup();
+                    using var logicalWriter = rowGroupWriter.NextColumn().LogicalWriter<int>();
+                    logicalWriter.WriteBatch(Enumerable.Range(0, rowsPerRowGroup).Select(i => rowGroupIdx * rowsPerRowGroup + i).ToArray());
+                }
+
+                fileWriter.Close();
+            }
+
+            using (var input = new BufferReader(buffer))
+            {
+                using var fileReader = new ParquetFileReader(input);
+                // Specify a subset of row groups out of order
+                var rowGroupIndices = new[] { 1, 6, 3, 4 };
+                var dataFrame = fileReader.ToDataFrame(rowGroupIndices: rowGroupIndices);
+                fileReader.Close();
+
+                var column = dataFrame["col"];
+                Assert.Equal(rowsPerRowGroup * rowGroupIndices.Length, column.Length);
+                for (var i = 0; i < column.Length; ++i)
+                {
+                    var rowGroupIndex = rowGroupIndices[i / rowsPerRowGroup];
+                    var expectedVal = rowGroupIndex * rowsPerRowGroup + i % rowsPerRowGroup;
+                    Assert.Equal(expectedVal, column[i]);
+                }
+            }
+        }
+
+        [Fact]
         public void ThrowsOnInvalidColumnName()
         {
             var testColumns = GetTestColumns();

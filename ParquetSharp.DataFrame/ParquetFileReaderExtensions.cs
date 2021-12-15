@@ -13,7 +13,18 @@ namespace ParquetSharp
         /// <returns>Data from the Parquet file as a DataFrame</returns>
         public static DataFrame ToDataFrame(this ParquetFileReader fileReader)
         {
-            return ToDataFrameImpl(fileReader, null);
+            return ToDataFrameImpl(fileReader, null, null);
+        }
+
+        /// <summary>
+        /// Read specific row groups from a parquet file into a DataFrame
+        /// </summary>
+        /// <param name="fileReader">Reader for the ParquetFile to read</param>
+        /// <param name="rowGroupIndices">Indices of row groups to read</param>
+        /// <returns>Data from the Parquet file as a DataFrame</returns>
+        public static DataFrame ToDataFrame(this ParquetFileReader fileReader, IReadOnlyList<int> rowGroupIndices)
+        {
+            return ToDataFrameImpl(fileReader, null, rowGroupIndices);
         }
 
         /// <summary>
@@ -24,14 +35,28 @@ namespace ParquetSharp
         /// <returns>Column Data from the Parquet file as a DataFrame</returns>
         public static DataFrame ToDataFrame(this ParquetFileReader fileReader, IReadOnlyList<string> columns)
         {
-            return ToDataFrameImpl(fileReader, columns);
+            return ToDataFrameImpl(fileReader, columns, null);
         }
 
-        private static DataFrame ToDataFrameImpl(this ParquetFileReader fileReader, IReadOnlyList<string>? columns = null)
+        /// <summary>
+        /// Read specific columns and row groups from a parquet file into a DataFrame
+        /// </summary>
+        /// <param name="fileReader">Reader for the ParquetFile to read</param>
+        /// <param name="columns">List of columns to read</param>
+        /// <param name="rowGroupIndices">Indices of row groups to read</param>
+        /// <returns>Column Data from the Parquet file as a DataFrame</returns>
+        public static DataFrame ToDataFrame(
+            this ParquetFileReader fileReader, IReadOnlyList<string> columns, IReadOnlyList<int> rowGroupIndices)
+        {
+            return ToDataFrameImpl(fileReader, columns, rowGroupIndices);
+        }
+
+        private static DataFrame ToDataFrameImpl(
+            this ParquetFileReader fileReader, IReadOnlyList<string>? columns = null, IReadOnlyList<int>? rowGroupIndices = null)
         {
             var numColumns = columns?.Count ?? fileReader.FileMetaData.NumColumns;
-            var numRows = fileReader.FileMetaData.NumRows;
             var dataFrameColumns = new List<DataFrameColumn>(numColumns);
+            var numRows = rowGroupIndices == null ? fileReader.FileMetaData.NumRows : GetNumRows(fileReader, rowGroupIndices);
 
             var columnIndexMap = new int[numColumns];
             for (var i = 0; i < numColumns; ++i)
@@ -40,9 +65,11 @@ namespace ParquetSharp
             }
 
             long offset = 0;
-            for (var rowGroupIdx = 0; rowGroupIdx < fileReader.FileMetaData.NumRowGroups; ++rowGroupIdx)
+            var numRowGroups = rowGroupIndices?.Count ?? fileReader.FileMetaData.NumRowGroups;
+            for (var rowGroupIdx = 0; rowGroupIdx < numRowGroups; ++rowGroupIdx)
             {
-                using var rowGroupReader = fileReader.RowGroup(rowGroupIdx);
+                var fileRowGroupIdx = rowGroupIndices == null ? rowGroupIdx : rowGroupIndices[rowGroupIdx];
+                using var rowGroupReader = fileReader.RowGroup(fileRowGroupIdx);
                 for (var colIdx = 0; colIdx < numColumns; ++colIdx)
                 {
                     using var columnReader = rowGroupReader.Column(columnIndexMap[colIdx]);
@@ -63,6 +90,18 @@ namespace ParquetSharp
             }
 
             return new DataFrame(dataFrameColumns);
+        }
+
+        private static long GetNumRows(ParquetFileReader fileReader, IReadOnlyList<int> rowGroupIndices)
+        {
+            var totalRows = 0L;
+            foreach (var rowGroupIdx in rowGroupIndices)
+            {
+                using var rowGroupReader = fileReader.RowGroup(rowGroupIdx);
+                totalRows += rowGroupReader.MetaData.NumRows;
+            }
+
+            return totalRows;
         }
 
         private static int FindColumnIndex(string column, SchemaDescriptor schema)

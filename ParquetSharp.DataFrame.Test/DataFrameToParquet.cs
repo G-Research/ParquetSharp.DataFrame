@@ -59,6 +59,44 @@ namespace ParquetSharp.DataFrame.Test
         }
 
         [Fact]
+        public void TestToParquetWithMultipleRowGroups()
+        {
+            const int numRows = 10_000;
+            const int rowGroupSize = 1024;
+            var testColumns = GetTestColumns().Where(c => c.GetColumn(1).Name == "int32").ToArray();
+            Assert.Single(testColumns);
+
+            var columns = new[] { testColumns[0].GetColumn(numRows) };
+            var dataFrame = new Microsoft.Data.Analysis.DataFrame(columns);
+            using var dir = new UnitTestDisposableDirectory();
+            var filePath = Path.Combine(dir.Info.FullName, "test.parquet");
+            dataFrame.ToParquet(filePath, rowGroupSize: rowGroupSize);
+
+            Assert.True(File.Exists(filePath));
+
+            using var fileReader = new ParquetFileReader(filePath);
+            Assert.Equal(testColumns.Length, fileReader.FileMetaData.NumColumns);
+            Assert.Equal(numRows, fileReader.FileMetaData.NumRows);
+
+            Assert.Equal((numRows + rowGroupSize - 1) / rowGroupSize, fileReader.FileMetaData.NumRowGroups);
+
+            long offset = 0;
+            for (var rowGroupIdx = 0; rowGroupIdx < fileReader.FileMetaData.NumRowGroups; ++rowGroupIdx)
+            {
+                using var rowGroupReader = fileReader.RowGroup(rowGroupIdx);
+                int colIdx = 0;
+                foreach (var testCol in testColumns)
+                {
+                    using var parquetCol = rowGroupReader.Column(colIdx++);
+                    using var logicalReader = parquetCol.LogicalReader();
+                    testCol.VerifyData(logicalReader, offset);
+                }
+
+                offset += rowGroupReader.MetaData.NumRows;
+            }
+        }
+
+        [Fact]
         public void TestCustomParquetWriterProperties()
         {
             int numRows = 10_000;

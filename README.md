@@ -18,14 +18,17 @@ using (var parquetReader = new ParquetFileReader(parquet_file_path))
     var dataFrame = parquetReader.ToDataFrame();
     parquetReader.Close();
 }
-
 ```
 
-An overload is provided that allows you to read specific columns from the Parquet file:
+Overloads are provided that allow you to read specific columns from the Parquet file,
+and/or a subset of row groups:
 
 ```C#
 var dataFrame = parquetReader.ToDataFrame(columns: new [] {"col_1", "col_2"});
+```
 
+```C#
+var dataFrame = parquetReader.ToDataFrame(rowGroupIndices: new [] {0, 1});
 ```
 
 ## Writing Parquet files
