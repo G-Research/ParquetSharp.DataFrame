@@ -6,9 +6,25 @@
     <AssemblyName>ParquetSharp.DataFrame</AssemblyName>
     <RootNamespace>ParquetSharp</RootNamespace>
     <Nullable>enable</Nullable>
+    <PlatformTarget Condition="'$(TargetFramework)'=='net471'">x64</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Version>0.1.0</Version>
+    <Company>G-Research</Company>
+    <Authors>G-Research</Authors>
+    <Product>ParquetSharp.DataFrame</Product>
+    <Description>ParquetSharp.DataFrame is a .NET library for reading and writing Apache Parquet files into/from .NET DataFrames, using ParquetSharp.</Description>
+    <Copyright>Copyright G-Research 2021</Copyright>
+    <PackageProjectUrl>https://github.com/G-Research/ParquetSharp.DataFrame</PackageProjectUrl>
+    <PackageTags>dataframe apache parquet gresearch g-research .net c#</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup Label="Additional nuget files">
+    <None Include="../LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Analysis" Version="0.19.0" />
