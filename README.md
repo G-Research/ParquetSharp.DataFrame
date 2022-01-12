@@ -1,5 +1,8 @@
 # ParquetSharp.DataFrame
 
+[![CI Status](https://github.com/G-Research/ParquetSharp.DataFrame/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/G-Research/ParquetSharp.DataFrame/actions/workflows/ci.yml?query=branch%3Amain+event%3Apush)
+[![NuGet latest release](https://img.shields.io/nuget/v/ParquetSharp.DataFrame.svg)](https://www.nuget.org/packages/ParquetSharp.DataFrame)
+
 ParquetSharp.DataFrame is a .NET library for reading and writing Apache Parquet files into/from .NET [DataFrames][1], using [ParquetSharp][2].
 
 [1]: https://docs.microsoft.com/en-us/dotnet/api/microsoft.data.analysis.dataframe
