@@ -146,7 +146,7 @@ jobs:
       id: check-version
       shell: pwsh
       run: |
-        $version = (Select-Xml -Path ./ParquetSharp.DataFrame.csproj -XPath '/Project/PropertyGroup/Version/text()').node.Value
+        $version = (Select-Xml -Path ./ParquetSharp.DataFrame/ParquetSharp.DataFrame.csproj -XPath '/Project/PropertyGroup/Version/text()').node.Value
         $tag = "${{ github.ref }}".SubString(10)
         if (-not ($tag -eq $version)) {
           echo "::error ::There is a mismatch between the project version ($version) and the tag ($tag)"
