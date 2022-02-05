@@ -13,7 +13,7 @@ namespace ParquetSharp
         /// <param name="dataFrame">DataFrame to write.</param>
         /// <param name="fileWriter">Writer to use.</param>
         /// <param name="rowGroupSize">Maximum number of rows per row group</param>
-        public static void Write(DataFrame dataFrame, ParquetFileWriter fileWriter, int rowGroupSize = 1024 * 1024)
+        public static void ToParquet(this DataFrame dataFrame, ParquetFileWriter fileWriter, int rowGroupSize = 1024 * 1024)
         {
             long numRows = dataFrame.Rows.Count;
             long offset = 0L;
@@ -55,7 +55,7 @@ namespace ParquetSharp
 
             foreach (DataFrame dataFrame in dataFrames)
             {
-                Write(dataFrame, fileWriter, rowGroupSize);
+                dataFrame.ToParquet(fileWriter, rowGroupSize);
             }
 
             fileWriter.Close();
@@ -75,7 +75,7 @@ namespace ParquetSharp
             IReadOnlyDictionary<string, LogicalType>? logicalTypeOverrides = null, int rowGroupSize = 1024 * 1024)
         {
             using ParquetFileWriter fileWriter = GetParquetFileWriter(path, writerProperties, logicalTypeOverrides, dataFrame);
-            Write(dataFrame, fileWriter, rowGroupSize);
+            dataFrame.ToParquet(fileWriter, rowGroupSize);
 
             fileWriter.Close();
         }
