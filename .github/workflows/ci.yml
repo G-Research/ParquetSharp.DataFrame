@@ -7,26 +7,24 @@ on:
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_NOLOGO: true
-  dotnet_3_version: '3.1.415'
-  dotnet_5_version: '5.0.403'
 
 jobs:
 
   check-format:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
     name: Check format
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v1
+        uses: actions/checkout@v3
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{ env.dotnet_5_version }}
+          dotnet-version: 7.0.x
       - name: Code formating check
         run: |
           dotnet tool restore
-          dotnet jb cleanupcode --profile="Built-in: Reformat Code" --settings="ParquetSharp.DataFrame.DotSettings" --dotnetcoresdk=${{ env.dotnet_5_version }} --verbosity=WARN "ParquetSharp.DataFrame" "ParquetSharp.DataFrame.Test"
+          dotnet jb cleanupcode --profile="Built-in: Reformat Code" --settings="ParquetSharp.DataFrame.DotSettings" --verbosity=WARN "ParquetSharp.DataFrame" "ParquetSharp.DataFrame.Test"
 
           files=($(git diff --name-only))
           if [ ${#files[@]} -gt 0 ]
@@ -38,22 +36,20 @@ jobs:
   # Build the nuget package and upload it as an artifact.
   build-nuget:
     name: Build NuGet package
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/checkout@v3
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: ${{ env.dotnet_5_version }}
-    - name: Pin .NET Core SDK
-      run: dotnet new globaljson --sdk-version ${{ env.dotnet_5_version }}
+        dotnet-version: 7.0.x
     - name: Build project
       run: dotnet build ParquetSharp.DataFrame --configuration=Release
     - name: Build NuGet package
       run: dotnet pack ParquetSharp.DataFrame --configuration=Release --no-build --output nuget
     - name: Upload NuGet artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: nuget-package
         path: nuget
@@ -62,12 +58,12 @@ jobs:
   test-nuget:
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
-        dotnet: [3, 5]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        dotnet: [netcoreapp3.1, net6.0, net7.0]
         arch: [x64]
         include:
         - os: windows-latest
-          dotnet: 4
+          dotnet: net472
           arch: x64
       fail-fast: false
     name: Test NuGet package (.NET ${{ matrix.dotnet }} ${{ matrix.arch }} on ${{ matrix.os }})
@@ -75,43 +71,30 @@ jobs:
     needs: build-nuget
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Get version
       id: get-version
-      run: echo "::set-output name=version::$((Select-Xml -Path ./ParquetSharp.DataFrame/ParquetSharp.DataFrame.csproj -XPath '/Project/PropertyGroup/Version/text()').node.Value)"
+      run: echo "version=$((Select-Xml -Path ./ParquetSharp.DataFrame/ParquetSharp.DataFrame.csproj -XPath '/Project/PropertyGroup/Version/text()').node.Value)" >> $env:GITHUB_OUTPUT
       shell: pwsh
     - name: Download NuGet artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: nuget-package
         path: nuget
-    - name: Setup .NET variables
-      id: dotnet
-      shell: bash
-      run: |
-        major=${{ matrix.dotnet }}
-        case $major in
-          3)
-            framework=netcoreapp3.1
-            ;;
-          4)
-            framework=net472
-            # We build for .NET framework with .NET Core 3.1 SDK
-            major=3
-            ;;
-          5)
-            framework=net5.0
-            ;;
-        esac
-        version=dotnet_${major}_version
-        echo "::set-output name=version::${!version}"
-        echo "::set-output name=framework::$framework"
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - name: Setup .NET Core 3.1 SDK
+      if: matrix.dotnet == 'netcoreapp3.1'
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: ${{ steps.dotnet.outputs.version }}
-    - name: Pin .NET Core SDK
-      run: dotnet new globaljson --sdk-version ${{ steps.dotnet.outputs.version }}
+        dotnet-version: 3.1.x
+    - name: Setup .NET 6 SDK
+      if: matrix.dotnet == 'net6.0'
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Setup .NET 7 SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
     - name: Add local NuGet feed
       run: |
         dotnet new nugetconfig
@@ -121,7 +104,7 @@ jobs:
         dotnet remove ParquetSharp.DataFrame.Test reference ParquetSharp.DataFrame/ParquetSharp.DataFrame.csproj
         dotnet add ParquetSharp.DataFrame.Test package ParquetSharp.DataFrame -v ${{ steps.get-version.outputs.version }}
     - name: Build & Run .NET unit tests
-      run: dotnet test ParquetSharp.DataFrame.Test --configuration=Release --framework ${{ steps.dotnet.outputs.framework }}
+      run: dotnet test ParquetSharp.DataFrame.Test --configuration=Release --framework ${{ matrix.dotnet }}
 
   # Virtual job that can be configured as a required check before a PR can be merged.
   all-required-checks-done:
@@ -141,7 +124,7 @@ jobs:
     needs: all-required-checks-done
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Check version
       id: check-version
       shell: pwsh
@@ -152,9 +135,9 @@ jobs:
           echo "::error ::There is a mismatch between the project version ($version) and the tag ($tag)"
           exit 1
         }
-        echo "::set-output name=version::$version"
+        echo "version=$version" >> $env:GITHUB_OUTPUT
     - name: Download NuGet artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: nuget-package
         path: nuget
