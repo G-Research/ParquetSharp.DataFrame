@@ -35,6 +35,7 @@ jobs:
 
   # Build the nuget package and upload it as an artifact.
   build-nuget:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
     name: Build NuGet package
     runs-on: ubuntu-latest
     steps:
