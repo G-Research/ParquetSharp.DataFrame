@@ -110,7 +110,6 @@ jobs:
   # Virtual job that can be configured as a required check before a PR can be merged.
   all-required-checks-done:
     name: All required checks done
-    if: ${{ always() && (github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id) }}
     needs:
       - check-format
       - test-nuget
@@ -119,12 +118,18 @@ jobs:
       - uses: actions/github-script@v6
         with:
           script: |
-            const results = ${{ toJSON(needs.*.result) }};
-            if (results.every(res => res === 'success')) {
-              core.info('All required checks succeeded');
-            } else {
-              core.setFailed('Some required checks failed');
-            }
+            github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'All required checks succeeded',
+              head_sha: context.sha,
+              status: 'completed',
+              conclusion: 'success',
+              output: {
+                title: 'All required checks done',
+                summary: 'All required checks succeeded'
+              }
+            });
 
   # Create a GitHub release and publish the NuGet packages to nuget.org when a tag is pushed.
   publish-release:
