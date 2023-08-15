@@ -35,6 +35,7 @@ jobs:
 
   # Build the nuget package and upload it as an artifact.
   build-nuget:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
     name: Build NuGet package
     runs-on: ubuntu-latest
     steps:
@@ -107,6 +108,8 @@ jobs:
       run: dotnet test ParquetSharp.DataFrame.Test --configuration=Release --framework ${{ matrix.dotnet }}
 
   # Virtual job that can be configured as a required check before a PR can be merged.
+  # As GitHub considers a check as successful if it is skipped, we need to check its status in
+  # another workflow (check-required.yml) and create a check there.
   all-required-checks-done:
     name: All required checks done
     needs:
