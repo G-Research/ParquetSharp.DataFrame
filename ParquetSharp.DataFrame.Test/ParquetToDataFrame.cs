@@ -445,7 +445,7 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     ParquetColumn = new Column<DateTime>("dateTime"),
-                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<DateTime>),
+                    ExpectedColumnType = typeof(DateTimeDataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<DateTime>();
@@ -464,7 +464,7 @@ namespace ParquetSharp.DataFrame.Test
                 new TestColumn
                 {
                     ParquetColumn = new Column<DateTime?>("nullable_dateTime"),
-                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<DateTime>),
+                    ExpectedColumnType = typeof(DateTimeDataFrameColumn),
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<DateTime?>();
