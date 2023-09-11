@@ -67,7 +67,7 @@ namespace ParquetSharp
                     return new DoubleDataFrameColumn(_columnName, _numRows);
                 case LogicalColumnReader<DateTime>:
                 case LogicalColumnReader<DateTime?>:
-                    return new PrimitiveDataFrameColumn<DateTime>(_columnName, _numRows);
+                    return new DateTimeDataFrameColumn(_columnName, _numRows);
                 case LogicalColumnReader<DateTimeNanos>:
                 case LogicalColumnReader<DateTimeNanos?>:
                     return new PrimitiveDataFrameColumn<DateTimeNanos>(_columnName, _numRows);
