@@ -17,6 +17,7 @@
     <PackageProjectUrl>https://github.com/G-Research/ParquetSharp.DataFrame</PackageProjectUrl>
     <PackageTags>dataframe apache parquet gresearch g-research .net c#</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <CodeAnalysisRuleSet>stylecop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup Label="Additional nuget files">
@@ -29,6 +30,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Analysis" Version="0.20.1" />
     <PackageReference Include="ParquetSharp" Version="4.0.0" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
