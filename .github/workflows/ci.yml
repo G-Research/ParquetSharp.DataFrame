@@ -78,7 +78,7 @@ jobs:
       run: echo "version=$((Select-Xml -Path ./ParquetSharp.DataFrame/ParquetSharp.DataFrame.csproj -XPath '/Project/PropertyGroup/Version/text()').node.Value)" >> $env:GITHUB_OUTPUT
       shell: pwsh
     - name: Download NuGet artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: nuget-package
         path: nuget
@@ -140,7 +140,7 @@ jobs:
         }
         echo "version=$version" >> $env:GITHUB_OUTPUT
     - name: Download NuGet artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: nuget-package
         path: nuget
