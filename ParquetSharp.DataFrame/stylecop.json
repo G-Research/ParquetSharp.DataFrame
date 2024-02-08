@@ -1,8 +1,0 @@
-{
-  "settings": {
-    "documentationRules": {
-      "documentInterfaces": false,
-      "documentExposedElements": true
-    }
-  }
-}
