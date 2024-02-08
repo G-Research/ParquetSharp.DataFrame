@@ -24,6 +24,7 @@ jobs:
       - name: Code formating check
         run: |
           dotnet tool restore
+          dotnet tool run dotnet-format
           dotnet jb cleanupcode --profile="Built-in: Reformat Code" --settings="ParquetSharp.DataFrame.DotSettings" --verbosity=WARN "ParquetSharp.DataFrame" "ParquetSharp.DataFrame.Test"
 
           files=($(git diff --name-only))
