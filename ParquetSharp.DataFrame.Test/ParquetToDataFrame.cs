@@ -675,6 +675,40 @@ namespace ParquetSharp.DataFrame.Test
                         }
                     }
                 },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<Guid>("guid", LogicalType.Uuid()),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<Guid>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<Guid>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => new Guid(i, 0, 0, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 })).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(new Guid(i, 0, 0, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }), column[i]);
+                        }
+                    }
+                },
+                new TestColumn
+                {
+                    ParquetColumn = new Column<Guid?>("nullable_guid", LogicalType.Uuid()),
+                    ExpectedColumnType = typeof(PrimitiveDataFrameColumn<Guid>),
+                    WriteColumn = (numRows, columnWriter) =>
+                    {
+                        using var logicalWriter = columnWriter.LogicalWriter<Guid?>();
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (Guid?)new Guid(i, 0, 0, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 })).ToArray());
+                    },
+                    VerifyColumn = column =>
+                    {
+                        for (int i = 0; i < column.Length; ++i)
+                        {
+                            Assert.Equal(new Guid(i, 0, 0, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }), column[i]);
+                        }
+                    }
+                },
             };
         }
     }
