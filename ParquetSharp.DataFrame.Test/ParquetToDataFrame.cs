@@ -682,13 +682,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<Guid>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => new Guid(i, 0, 0, new byte[]{0,0,0,0,0,0,0,0})).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => new Guid(i, 0, 0, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 })).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(new Guid(i, 0, 0, new byte[]{0,0,0,0,0,0,0,0}), column[i]);
+                            Assert.Equal(new Guid(i, 0, 0, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }), column[i]);
                         }
                     }
                 },
@@ -699,13 +699,13 @@ namespace ParquetSharp.DataFrame.Test
                     WriteColumn = (numRows, columnWriter) =>
                     {
                         using var logicalWriter = columnWriter.LogicalWriter<Guid?>();
-                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (Guid?)new Guid(i, 0, 0, new byte[]{0,0,0,0,0,0,0,0})).ToArray());
+                        logicalWriter.WriteBatch(Enumerable.Range(0, numRows).Select(i => (Guid?)new Guid(i, 0, 0, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 })).ToArray());
                     },
                     VerifyColumn = column =>
                     {
                         for (int i = 0; i < column.Length; ++i)
                         {
-                            Assert.Equal(new Guid(i, 0, 0, new byte[]{0, 0, 0, 0, 0, 0, 0, 0 }), column[i]);
+                            Assert.Equal(new Guid(i, 0, 0, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }), column[i]);
                         }
                     }
                 },
