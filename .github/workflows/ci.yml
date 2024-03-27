@@ -24,6 +24,7 @@ jobs:
       - name: Code formating check
         run: |
           dotnet tool restore
+          dotnet tool run dotnet-format  -- --check
           dotnet jb cleanupcode --profile="Built-in: Reformat Code" --settings="ParquetSharp.DataFrame.DotSettings" --verbosity=WARN "ParquetSharp.DataFrame" "ParquetSharp.DataFrame.Test"
 
           files=($(git diff --name-only))
@@ -147,7 +148,7 @@ jobs:
     # if version contains "-" treat it as pre-release
     # example: 1.0.0-beta1
     - name: Create release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         name: ParquetSharp.DataFrame ${{ steps.check-version.outputs.version }}
         draft: true
