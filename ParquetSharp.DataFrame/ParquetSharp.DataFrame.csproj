@@ -16,15 +16,10 @@
     <Copyright>Copyright G-Research 2021</Copyright>
     <PackageProjectUrl>https://github.com/G-Research/ParquetSharp.DataFrame</PackageProjectUrl>
     <PackageTags>dataframe apache parquet gresearch g-research .net c#</PackageTags>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/G-Research/ParquetSharp.DataFrame</RepositoryUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
-
-  <ItemGroup Label="Additional nuget files">
-    <None Include="../LICENSE">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Analysis" Version="0.20.1" />
