@@ -78,6 +78,10 @@ dataFrame.ToParquet(parquet_file_path, logicalTypeOverrides: new Dictionary<stri
 We welcome new contributors! We will happily receive PRs for bug fixes or small changes.
 If you're contemplating something larger please get in touch first by opening a GitHub Issue describing the problem and how you propose to solve it.
 
+## Security
+
+Please see our [security policy](https://github.com/G-Research/ParquetSharp.DataFrame/blob/main/SECURITY.md) for details on reporting security vulnerabilities.
+
 ## License
 
 Copyright 2021 G-Research
