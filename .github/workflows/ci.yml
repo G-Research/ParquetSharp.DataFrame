@@ -20,7 +20,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 8.0.x
       - name: Code formating check
         run: |
           dotnet tool restore
@@ -45,7 +45,7 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
     - name: Build project
       run: dotnet build ParquetSharp.DataFrame --configuration=Release
     - name: Build NuGet package
@@ -60,15 +60,13 @@ jobs:
   test-nuget:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        dotnet: [netcoreapp3.1, net6.0, net7.0]
-        arch: [x64]
+        os: [ubuntu-latest, macos-latest, macos-13, windows-latest]  # macos-13 included for x64
+        dotnet: [net6.0, net7.0, net8.0]
         include:
         - os: windows-latest
           dotnet: net472
-          arch: x64
       fail-fast: false
-    name: Test NuGet package (.NET ${{ matrix.dotnet }} ${{ matrix.arch }} on ${{ matrix.os }})
+    name: Test NuGet package (.NET ${{ matrix.dotnet }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: build-nuget
     steps:
@@ -83,20 +81,20 @@ jobs:
       with:
         name: nuget-package
         path: nuget
-    - name: Setup .NET Core 3.1 SDK
-      if: matrix.dotnet == 'netcoreapp3.1'
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 3.1.x
     - name: Setup .NET 6 SDK
       if: matrix.dotnet == 'net6.0'
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.0.x
     - name: Setup .NET 7 SDK
+      if: matrix.dotnet == 'net7.0'
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 7.0.x
+    - name: Setup .NET 8 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
     - name: Add local NuGet feed
       run: |
         dotnet new nugetconfig
