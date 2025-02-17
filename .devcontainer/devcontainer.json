@@ -1,0 +1,26 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
+{
+	"name": "C# (.NET) Development",
+	"image": "mcr.microsoft.com/devcontainers/dotnet:1-9.0-bookworm",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+	},
+
+	"postCreateCommand": "dotnet restore",
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-dotnettools.csharp",
+				"formulahendry.dotnet-test-explorer",
+				"ryanluker.vscode-coverage-gutters",
+				"streetsidesoftware.code-spell-checker",
+				"github.copilot",
+				"ms-vscode.vscode-solution-explorer"
+			]
+		}
+	},
+
+	"remoteUser": "root"
+}
