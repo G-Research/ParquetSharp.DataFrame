@@ -2,7 +2,7 @@
 
 First off, thanks for taking the time to contribute! ❤️
 
-All types of contributions are encouraged and valued. See the [Table of Contents](#table-of-contents) for different ways to help and details about how this project handles them. Please make sure to read the relevant section before making your contribution. It will make it a lot easier for us maintainers and smooth out the experience for all involved. The community looks forward to your contributions. 🎉
+All types of contributions are encouraged and valued. See the [Table of Contents](#table-of-contents) for different ways to help and details about how this project handles them. Please make sure to read the relevant section before making your contribution. It will make it a lot easier for us maintainers and smooth out the experience for all involved. The community looks forward to your contributions.
 
 > And if you like the project, but just don't have time to contribute, that's fine. There are other easy ways to support the project and show your appreciation, which we would also be very happy about:
 > - Star the project
@@ -18,11 +18,8 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 - [I Want To Contribute](#i-want-to-contribute)
 - [Reporting Bugs](#reporting-bugs)
 - [Suggesting Enhancements](#suggesting-enhancements)
-- [Your First Code Contribution](#your-first-code-contribution)
-- [Improving The Documentation](#improving-the-documentation)
 - [Styleguides](#styleguides)
 - [Commit Messages](#commit-messages)
-- [Join The Project Team](#join-the-project-team)
 
 
 ## Code of Conduct
@@ -35,7 +32,7 @@ to <>.
 
 ## I Have a Question
 
-> If you want to ask a question, we assume that you have read the available [Documentation]().
+> If you want to ask a question, we assume that you have read the available [README.md](README.md).
 
 Before you ask a question, it is best to search for existing [Issues](/issues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.
 
@@ -43,11 +40,12 @@ If you then still feel the need to ask a question and need clarification, we rec
 
 - Open an [Issue](/issues/new).
 - Provide as much context as you can about what you're running into.
-- Provide project and platform versions (nodejs, npm, etc), depending on what seems relevant.
+- Provide the version of the project you are using.
+- Provide the version of .NET you are using, as well as the version of the operating system you are using.
+- Explain what you expected to happen and what actually happened.
+- Explain what you did to solve the problem (if you did).
 
 We will then take care of the issue as soon as possible.
-
-
 
 ## I Want To Contribute
 
@@ -56,6 +54,17 @@ We will then take care of the issue as soon as possible.
 
 ### Reporting Bugs
 
+> We use GitHub issues to track bugs and errors. If you run into an issue with the project:
+
+- Open an [Issue](/issues/new).
+- Explain the behavior you would expect and the actual behavior.
+- Please provide as much context as possible and describe the *reproduction steps* that someone else can follow to recreate the issue on their own. This usually includes your code. For good bug reports you should isolate the problem and create a reduced test case.
+- Provide the information you collected in the previous section.
+
+Once it's filed:
+
+- The project team will label the issue accordingly.
+- A team member will try to reproduce the issue with your provided steps. If there are no reproduction steps or no obvious way to reproduce the issue, the team will ask you for those steps and mark the issue as `needs-repro`. Bugs with the `needs-repro` tag will not be addressed until they are reproduced.
 
 #### Before Submitting a Bug Report
 
@@ -88,11 +97,9 @@ We use GitHub issues to track bugs and errors. If you run into an issue with the
 Once it's filed:
 
 - The project team will label the issue accordingly.
-- A team member will try to reproduce the issue with your provided steps. If there are no reproduction steps or no obvious way to reproduce the issue, the team will ask you for those steps and mark the issue as `needs-repro`. Bugs with the `needs-repro` tag will not be addressed until they are reproduced.
-- If the team is able to reproduce the issue, it will be marked `needs-fix`, as well as possibly other tags (such as `critical`), and the issue will be left to be [implemented by someone](#your-first-code-contribution).
+- A team member will try to reproduce the issue with your provided steps. If there are no reproduction steps or no obvious way to reproduce the issue, the team will ask you for those steps and mark the issue as `invalid`. Bugs with the `invalid` tag will not be addressed.
 
-
-
+- If the team is able to reproduce the issue, it will be marked `bug`, as well as possibly other tags (such as `help wanted`), and the issue will be left to be [implemented by someone](#your-first-code-contribution).
 
 ### Suggesting Enhancements
 
@@ -117,21 +124,23 @@ Enhancement suggestions are tracked as [GitHub issues](/issues).
 - You may want to **include screenshots and animated GIFs** which help you demonstrate the steps or point out the part which the suggestion is related to. You can use [this tool](https://www.cockos.com/licecap/) to record GIFs on macOS and Windows, and [this tool](https://github.com/colinkeenan/silentcast) or [this tool](https://github.com/GNOME/byzanz) on Linux. 
 - **Explain why this enhancement would be useful** to most CONTRIBUTING.md users. You may also want to point out the other projects that solved it better and which could serve as inspiration.
 
-
-
-### Your First Code Contribution
-
-
-### Improving The Documentation
-
-
 ## Styleguides
 ### Commit Messages
 
+> We encourage the use of [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit messages. This helps in understanding the history of changes and automating the release process.
 
-## Join The Project Team
+### Conventional Commits Guidelines
 
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing or correcting existing tests
+- **chore**: Changes to the build process or auxiliary tools and libraries such as documentation generation
 
+Using these conventions will help maintain a clean and understandable commit history.
 
 ## Attribution
-This guide is based on the **contributing.md**. [Make your own](https://contributing.md/)!
+This guide is based on the **contributing.md** guide from [contributing.md](https://contributing.md/).
