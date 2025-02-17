@@ -58,6 +58,10 @@ Once it's filed:
 
 #### Before Submitting a Bug Report
 
+> You must never report security related issues, vulnerabilities or bugs including sensitive information to the issue tracker, or elsewhere in public.
+> Instead, please refer to our [SECURITY.md](SECURITY.md) for guidelines on reporting security issues responsibly.
+
+
 A good bug report shouldn't leave others needing to chase you up for more information. Please complete the following steps in advance to help us fix any potential bug as fast as possible:
 
 - Make sure that you are using the latest version.
