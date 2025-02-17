@@ -54,13 +54,12 @@ We will then take care of the issue as soon as possible.
 
 Once it's filed:
 
-- A team member will try to reproduce the issue with your provided steps. If there are no reproduction steps or no obvious way to reproduce the issue, the team will not be able to address your bug.
+- A team member will try to reproduce the issue with your provided steps, and it will be labeled as "needs-repro". If there are no reproduction steps or no obvious way to reproduce the issue, the team will not be able to address your bug.
 
 #### Before Submitting a Bug Report
 
 > You must never report security related issues, vulnerabilities or bugs including sensitive information to the issue tracker, or elsewhere in public.
 > Instead, please refer to our [SECURITY.md](SECURITY.md) for guidelines on reporting security issues responsibly.
-
 
 A good bug report shouldn't leave others needing to chase you up for more information. Please complete the following steps in advance to help us fix any potential bug as fast as possible:
 
