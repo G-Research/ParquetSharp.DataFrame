@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
@@ -71,7 +71,7 @@ jobs:
     needs: build-nuget
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - name: Get version
       id: get-version
       run: echo "version=$((Select-Xml -Path ./ParquetSharp.DataFrame/ParquetSharp.DataFrame.csproj -XPath '/Project/PropertyGroup/Version/text()').node.Value)" >> $env:GITHUB_OUTPUT
@@ -126,7 +126,7 @@ jobs:
     needs: all-required-checks-done
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - name: Check version
       id: check-version
       shell: pwsh
