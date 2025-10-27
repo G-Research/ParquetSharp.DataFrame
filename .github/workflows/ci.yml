@@ -51,7 +51,7 @@ jobs:
     - name: Build NuGet package
       run: dotnet pack ParquetSharp.DataFrame --configuration=Release --no-build --output nuget
     - name: Upload NuGet artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: nuget-package
         path: nuget
