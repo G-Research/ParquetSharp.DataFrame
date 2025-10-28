@@ -1,5 +1,5 @@
 <!--
-Thanks for submitting a pull request to Consul.NET! Please provide the following information to help us review and merge
+Thanks for submitting a pull request to ParquetSharp.DataFrame! Please provide the following information to help us review and merge
 your changes effectively.
  -->
 
