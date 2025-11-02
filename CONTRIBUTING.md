@@ -4,6 +4,9 @@ Thank you for your interest in contributing! 🎉
 
 This library is primarily built and maintained to serve G-Research’s needs. While we welcome contributions, our main focus is ensuring the project continues to meet our requirements. We are more likely to accept bug fixes and documentation updates but may be conservative about new features.
 
+ParquetSharp.DataFrame is built as an extension of [ParquetSharp](https://github.com/G-Research/ParquetSharp), adding DataFrame functionality on top of its low-level Parquet file operations.  
+We recommend reviewing ParquetSharp's documentation to understand the underlying APIs before making contributions to ParquetSharp.DataFrame.
+
 We will review issues and pull requests on a **best-effort** basis.
 
 ## Issues
